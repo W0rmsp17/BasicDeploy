@@ -6,8 +6,8 @@
   "developer": {
     "name": "Plutonix MSP",
     "websiteUrl": "{{FRONTEND_BASE_URL}}",
-    "privacyUrl": "{{FRONTEND_BASE_URL}}/privacy",
-    "termsOfUseUrl": "{{FRONTEND_BASE_URL}}/terms"
+    "privacyUrl": "{{FRONTEND_BASE_URL}}/privacy.html",
+    "termsOfUseUrl": "{{FRONTEND_BASE_URL}}/terms.html"
   },
   "name": {
     "short": "M365 Onboarding",

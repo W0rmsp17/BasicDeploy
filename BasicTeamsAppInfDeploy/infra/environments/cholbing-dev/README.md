@@ -109,6 +109,14 @@ Generate a tenant-specific Teams manifest after the Static Web App exists:
 
 The generated manifest is written under `teams-app\manifest\.generated\manifest.json`.
 
+Package the Teams app manifest and icon assets:
+
+```powershell
+.\new-teams-package.ps1
+```
+
+The generated package is written under `teams-app\manifest\.generated\m365-onboarding-teams-app.zip`.
+
 ## Teams App Assignment Group
 
 Create or update the target tenant Entra group used to scope access to the Teams app:

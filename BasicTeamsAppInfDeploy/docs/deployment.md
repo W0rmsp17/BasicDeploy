@@ -110,6 +110,12 @@ After deployment, the generated manifest is written to:
 teams-app/manifest/.generated/manifest.json
 ```
 
+Create the uploadable Teams app package:
+
+```powershell
+.\infra\environments\cholbing-dev\new-teams-package.ps1
+```
+
 Upload or publish this package in Teams admin center. Then use the generated Entra group for Teams app assignment or setup policy targeting.
 
 ## Runtime Validation
