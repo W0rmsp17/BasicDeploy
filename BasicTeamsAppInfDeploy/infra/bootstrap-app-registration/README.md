@@ -72,5 +72,5 @@ Graph__ClientSecret=@Microsoft.KeyVault(SecretUri=<client_secret_key_vault_secre
 The approval sender mailbox UPN is not created here. Enter the actor-supplied value as:
 
 ```text
-Approval__SenderUserPrincipalName=onboarding@CholbingDevoutlook.onmicrosoft.com
+Approval__SenderUserPrincipalName=onboarding@contoso.onmicrosoft.com
 ```

@@ -1,9 +1,7 @@
 const apiBaseUrlFromEnv = import.meta.env.VITE_API_BASE_URL as string | undefined;
-const functionKeyFromEnv = import.meta.env.VITE_FUNCTION_KEY as string | undefined;
 
 export type RuntimeConfig = {
   apiBaseUrl: string;
-  functionKey: string;
 };
 
 const storageKey = "m365-onboarding-teams-config";
@@ -11,12 +9,10 @@ const storageKey = "m365-onboarding-teams-config";
 export function loadRuntimeConfig(): RuntimeConfig {
   const url = new URL(window.location.href);
   const queryApiBaseUrl = url.searchParams.get("apiBaseUrl");
-  const queryFunctionKey = url.searchParams.get("functionKey");
   const saved = readSavedConfig();
 
   return {
-    apiBaseUrl: queryApiBaseUrl ?? saved?.apiBaseUrl ?? apiBaseUrlFromEnv ?? "",
-    functionKey: queryFunctionKey ?? saved?.functionKey ?? functionKeyFromEnv ?? ""
+    apiBaseUrl: queryApiBaseUrl ?? saved?.apiBaseUrl ?? apiBaseUrlFromEnv ?? ""
   };
 }
 

@@ -13,7 +13,7 @@ public sealed class DenyOnboardingRequestFunction(
 {
     [Function(nameof(DenyOnboardingRequest))]
     public async Task<HttpResponseData> DenyOnboardingRequest(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "onboarding-requests/deny")] HttpRequestData request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "onboarding-requests/deny")] HttpRequestData request,
         CancellationToken cancellationToken)
     {
         var validation = approvalTokenService.ValidateToken(

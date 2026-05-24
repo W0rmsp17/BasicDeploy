@@ -1,12 +1,29 @@
+variable "environment_name" {
+  type        = string
+  description = "Short deployment environment name used in Azure resource names."
+  default     = "client-dev"
+}
+
 variable "location" {
   type        = string
-  description = "Azure region for the test deployment."
+  description = "Azure region for the deployment."
   default     = "australiaeast"
+}
+
+variable "target_tenant_domain" {
+  type        = string
+  description = "Default user domain for the target tenant, for example contoso.onmicrosoft.com."
+}
+
+variable "msp_tenant_domain" {
+  type        = string
+  description = "MSP tenant domain used for tagging and deployment documentation."
+  default     = ""
 }
 
 variable "graph_tenant_id" {
   type        = string
-  description = "Target tenant ID for CholbingDevoutlook.onmicrosoft.com."
+  description = "Target tenant ID."
 }
 
 variable "graph_client_id" {
@@ -31,7 +48,7 @@ variable "graph_client_secret_key_vault_secret_id" {
 
 variable "approval_recipient_email" {
   type        = string
-  description = "Approver mailbox in plutonix.onmicrosoft.com."
+  description = "Approver mailbox."
 }
 
 variable "approval_base_url" {
@@ -40,9 +57,15 @@ variable "approval_base_url" {
   default     = "https://pending-post-deploy-update"
 }
 
+variable "approval_provider" {
+  type        = string
+  description = "Approval notification provider: Graph or Logging."
+  default     = "Graph"
+}
+
 variable "approval_sender_user_principal_name" {
   type        = string
-  description = "Sender mailbox UPN in CholbingDevoutlook.onmicrosoft.com."
+  description = "Sender mailbox UPN in the target tenant."
 }
 
 variable "approval_token_signing_key" {

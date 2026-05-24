@@ -19,7 +19,7 @@ public sealed class SubmitOnboardingRequestFunction(
 
     [Function(nameof(SubmitOnboardingRequest))]
     public async Task<HttpResponseData> SubmitOnboardingRequest(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "onboarding-requests")] HttpRequestData request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "onboarding-requests")] HttpRequestData request,
         FunctionContext executionContext,
         CancellationToken cancellationToken)
     {

@@ -88,6 +88,38 @@ After apply, update the app setting to the generated Function App URL:
 
 The script reads Terraform outputs, builds `https://<function-app-hostname>`, updates `Approval__BaseUrl`, and prints the final value.
 
+## Deploy Teams Frontend
+
+The frontend is hosted from Azure Static Web Apps so users access it through Teams without running a local server.
+
+After Terraform apply:
+
+```powershell
+.\deploy-teams-frontend.ps1
+```
+
+The script builds `teams-app`, deploys the `dist` folder to the Static Web App, and bakes the Function App base URL into the bundle. It does not bake a Function key into the bundle.
+
+Generate a tenant-specific Teams manifest after the Static Web App exists:
+
+```powershell
+.\new-teams-manifest.ps1
+```
+
+The generated manifest is written under `teams-app\manifest\.generated\manifest.json`.
+
+## Teams App Assignment Group
+
+Create or update the target tenant Entra group used to scope access to the Teams app:
+
+```powershell
+.\ensure-teams-app-group.ps1
+```
+
+By default, the script creates `M365 Onboarding Teams App Users` if needed and prompts for the target user UPN to add.
+
+After the Teams app package is uploaded or published, use this group in Teams admin center for the app assignment or setup policy. That policy step is intentionally separate because it depends on the tenant's Teams admin model and the uploaded Teams app package.
+
 ## Graph Readiness
 
 Before testing Graph email or Graph user creation, verify the app registration:

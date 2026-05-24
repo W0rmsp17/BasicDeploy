@@ -62,7 +62,7 @@ The initial implementation exposes these Azure Functions:
   "lastName": "Wilber",
   "jobTitle": "Support Analyst",
   "department": "Operations",
-  "managerEmail": "manager@CholbingDevoutlook.onmicrosoft.com",
+  "managerEmail": "manager@contoso.onmicrosoft.com",
   "startDate": "2026-06-01",
   "requestedProfile": "Standard",
   "notes": "Test onboarding request"

@@ -1,8 +1,11 @@
 param(
     [string] $TerraformPath = "..\..\..\..\terraform.exe",
-    [string] $DefaultDeploymentAccountUpn = "cholbing@CholbingDevoutlook.onmicrosoft.com",
-    [string] $DefaultApprovalRecipientEmail = "cholbing@plutonix.onmicrosoft.com",
-    [string] $DefaultApprovalSenderUserPrincipalName = "cholbing@CholbingDevoutlook.onmicrosoft.com",
+    [string] $DefaultDeploymentAccountUpn = "admin@contoso.onmicrosoft.com",
+    [string] $DefaultApprovalRecipientEmail = "approver@msp.example.com",
+    [string] $DefaultApprovalSenderUserPrincipalName = "onboarding@contoso.onmicrosoft.com",
+    [string] $DefaultEnvironmentName = "contoso-dev",
+    [string] $DefaultTargetTenantDomain = "contoso.onmicrosoft.com",
+    [string] $DefaultMspTenantDomain = "msp.example.com",
     [string] $DefaultLicenseAssignmentMode = "DynamicGroup",
     [switch] $WriteTfvars
 )
@@ -154,6 +157,18 @@ $approvalSenderUserPrincipalName = Read-ValueOrDefault `
     -Prompt "Target tenant approval sender UPN" `
     -Default $DefaultApprovalSenderUserPrincipalName
 
+$environmentName = Read-ValueOrDefault `
+    -Prompt "Short environment name used in Azure resource names" `
+    -Default $DefaultEnvironmentName
+
+$targetTenantDomain = Read-ValueOrDefault `
+    -Prompt "Target tenant default user domain" `
+    -Default $DefaultTargetTenantDomain
+
+$mspTenantDomain = Read-ValueOrDefault `
+    -Prompt "MSP tenant domain for tags/docs" `
+    -Default $DefaultMspTenantDomain
+
 $licenseModes = @(
     $DefaultLicenseAssignmentMode,
     "DynamicGroup",
@@ -184,6 +199,10 @@ if ($selectedLicenseMode -eq "StaticGroup") {
 $approvalTokenSigningKey = New-TokenSigningKey
 
 $tfvars = @"
+environment_name = "$environmentName"
+target_tenant_domain = "$targetTenantDomain"
+msp_tenant_domain = "$mspTenantDomain"
+
 graph_tenant_id = "$($tenant.tenantId)"
 graph_client_id = "REPLACE_WITH_BOOTSTRAP_APPLICATION_CLIENT_ID"
 "@
@@ -217,6 +236,9 @@ Write-Host "Tenant:       $($tenant.displayName) ($($tenant.tenantId))"
 Write-Host "Subscription: $($subscription.name) ($($subscription.id))"
 Write-Host "Account:      $deploymentAccountUpn"
 Write-Host "Path:         $($deploymentPath.Name)"
+Write-Host "Environment:  $environmentName"
+Write-Host "Target domain:$targetTenantDomain"
+Write-Host "MSP domain:   $mspTenantDomain"
 Write-Host "Sender UPN:   $approvalSenderUserPrincipalName"
 Write-Host "Approver:     $approvalRecipientEmail"
 Write-Host "License mode: $selectedLicenseMode"

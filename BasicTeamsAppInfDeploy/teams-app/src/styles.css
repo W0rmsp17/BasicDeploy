@@ -137,7 +137,7 @@ h2 {
 
 .settings-panel {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.55fr) auto;
+  grid-template-columns: minmax(220px, 1fr) auto;
   gap: 14px;
   align-items: end;
   padding: 16px;

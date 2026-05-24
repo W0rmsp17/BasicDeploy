@@ -14,6 +14,11 @@ locals {
   storage_name      = substr("${local.normalized_prefix}${local.resource_suffix}", 0, 24)
   key_vault_name    = substr("kv${local.normalized_prefix}${local.resource_suffix}", 0, 24)
   function_name     = substr("func-${var.workload_name}-${var.environment_name}-${local.resource_suffix}", 0, 60)
+  static_web_app_name = substr(
+    "stapp-${var.workload_name}-${var.environment_name}-${local.resource_suffix}",
+    0,
+    60
+  )
   app_plan_name     = "plan-${var.workload_name}-${var.environment_name}-${local.resource_suffix}"
   app_insights_name = "appi-${var.workload_name}-${var.environment_name}-${local.resource_suffix}"
   graph_secret_id   = var.graph_client_secret_key_vault_secret_id != null ? var.graph_client_secret_key_vault_secret_id : azurerm_key_vault_secret.graph_client_secret[0].id
@@ -43,8 +48,8 @@ resource "azurerm_storage_table" "onboarding_requests" {
 }
 
 resource "azurerm_storage_queue" "create_user" {
-  name                 = "create-user"
-  storage_account_name = azurerm_storage_account.onboarding.name
+  name               = "create-user"
+  storage_account_id = azurerm_storage_account.onboarding.id
 }
 
 resource "azurerm_key_vault" "onboarding" {
@@ -113,6 +118,15 @@ resource "azurerm_application_insights" "onboarding" {
   tags                = var.tags
 }
 
+resource "azurerm_static_web_app" "teams_frontend" {
+  name                = local.static_web_app_name
+  resource_group_name = azurerm_resource_group.onboarding.name
+  location            = azurerm_resource_group.onboarding.location
+  sku_tier            = var.static_web_app_sku_tier
+  sku_size            = var.static_web_app_sku_size
+  tags                = var.tags
+}
+
 resource "azurerm_linux_function_app" "onboarding" {
   name                = local.function_name
   resource_group_name = azurerm_resource_group.onboarding.name
@@ -129,6 +143,16 @@ resource "azurerm_linux_function_app" "onboarding" {
   }
 
   site_config {
+    cors {
+      allowed_origins = distinct(concat(
+        [
+          "https://${azurerm_static_web_app.teams_frontend.default_host_name}"
+        ],
+        var.function_cors_allowed_origins
+      ))
+      support_credentials = false
+    }
+
     application_stack {
       dotnet_version              = "8.0"
       use_dotnet_isolated_runtime = true
@@ -139,7 +163,7 @@ resource "azurerm_linux_function_app" "onboarding" {
     FUNCTIONS_WORKER_RUNTIME              = "dotnet-isolated"
     AzureWebJobsStorage                   = azurerm_storage_account.onboarding.primary_connection_string
     APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.onboarding.connection_string
-    Approval__Provider                    = "Graph"
+    Approval__Provider                    = var.approval_provider
     Approval__BaseUrl                     = local.approval_base_url
     Approval__RecipientEmail              = var.approval_recipient_email
     Approval__SenderUserPrincipalName     = var.approval_sender_user_principal_name
@@ -154,6 +178,15 @@ resource "azurerm_linux_function_app" "onboarding" {
     Provisioning__LicenseAssignmentMode   = var.license_assignment_mode
     Provisioning__LicenseGroupId          = var.license_group_id
     WEBSITE_RUN_FROM_PACKAGE              = "1"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      app_settings["Approval__BaseUrl"],
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      site_config[0].application_insights_connection_string,
+      tags["hidden-link: /app-insights-resource-id"]
+    ]
   }
 }
 

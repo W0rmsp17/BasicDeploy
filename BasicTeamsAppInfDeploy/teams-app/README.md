@@ -6,6 +6,14 @@ React/Vite frontend for the Microsoft 365 onboarding Teams tab.
 
 The intended hosting target is Azure Static Web Apps in the target tenant subscription. The Teams app manifest points the tab at the Static Web Apps URL.
 
+For an environment-level deployment, run from the selected environment folder:
+
+```powershell
+cd ..\infra\environments\cholbing-dev
+.\deploy-teams-frontend.ps1
+.\new-teams-manifest.ps1
+```
+
 For local development:
 
 ```powershell
@@ -30,11 +38,10 @@ Copy-Item .env.example .env.local
 Set:
 
 - `VITE_API_BASE_URL`: Function App base URL, for example `https://func-name.azurewebsites.net`.
-- `VITE_FUNCTION_KEY`: temporary local/test Function key.
 
 The frontend also supports runtime configuration through the settings button. Values are stored in browser local storage.
 
-Do not use a bundled Function key as the production security model. The long-term production path should use Teams SSO or a small authenticated server-side proxy so secrets are not exposed in browser code.
+The MVP uses anonymous submit and approval callback endpoints. Approval and denial callbacks are protected by signed, expiring HMAC tokens. The long-term production path should use Teams SSO or a small authenticated server-side proxy for stronger request authentication.
 
 ## Teams Package
 

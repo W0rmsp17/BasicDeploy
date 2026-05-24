@@ -32,3 +32,18 @@ output "create_user_queue_name" {
   description = "Create user queue name."
   value       = azurerm_storage_queue.create_user.name
 }
+
+output "static_web_app_name" {
+  description = "Azure Static Web Apps resource name for the Teams frontend."
+  value       = azurerm_static_web_app.teams_frontend.name
+}
+
+output "static_web_app_default_hostname" {
+  description = "Default hostname for the Teams frontend."
+  value       = azurerm_static_web_app.teams_frontend.default_host_name
+}
+
+output "static_web_app_url" {
+  description = "Default HTTPS URL for the Teams frontend."
+  value       = "https://${azurerm_static_web_app.teams_frontend.default_host_name}"
+}

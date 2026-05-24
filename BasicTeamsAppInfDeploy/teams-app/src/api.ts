@@ -28,9 +28,6 @@ export async function submitOnboardingRequest(
   }
 
   const url = new URL("/api/onboarding-requests", normalizeBaseUrl(config.apiBaseUrl));
-  if (config.functionKey.trim()) {
-    url.searchParams.set("code", config.functionKey.trim());
-  }
 
   const response = await fetch(url, {
     method: "POST",

@@ -111,15 +111,6 @@ export function App({ isRunningInTeams }: AppProps) {
               placeholder="https://func-name.azurewebsites.net"
             />
           </label>
-          <label>
-            Function key
-            <input
-              value={config.functionKey}
-              onChange={(event) => updateConfig("functionKey", event.target.value)}
-              placeholder="Paste local test key"
-              type="password"
-            />
-          </label>
           <button className="secondary-button" type="button" onClick={handleSaveConfig}>
             <Save size={16} />
             Save

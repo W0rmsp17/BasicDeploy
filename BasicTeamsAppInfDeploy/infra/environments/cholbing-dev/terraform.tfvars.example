@@ -1,8 +1,12 @@
+environment_name     = "contoso-dev"
+target_tenant_domain = "contoso.onmicrosoft.com"
+msp_tenant_domain    = "msp.example.com"
+
 graph_tenant_id = "00000000-0000-0000-0000-000000000000"
 graph_client_id = "00000000-0000-0000-0000-000000000000"
 
-approval_recipient_email                = "approver@plutonix.onmicrosoft.com"
-approval_sender_user_principal_name     = "onboarding@CholbingDevoutlook.onmicrosoft.com"
+approval_recipient_email                = "approver@msp.example.com"
+approval_sender_user_principal_name     = "onboarding@contoso.onmicrosoft.com"
 
 license_assignment_mode = "DynamicGroup"
 license_group_id = ""

@@ -14,7 +14,7 @@ public sealed class ApproveOnboardingRequestFunction(
 {
     [Function(nameof(ApproveOnboardingRequest))]
     public async Task<ApprovalFunctionOutput> ApproveOnboardingRequest(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "onboarding-requests/approve")] HttpRequestData request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "onboarding-requests/approve")] HttpRequestData request,
         CancellationToken cancellationToken)
     {
         var validation = approvalTokenService.ValidateToken(
