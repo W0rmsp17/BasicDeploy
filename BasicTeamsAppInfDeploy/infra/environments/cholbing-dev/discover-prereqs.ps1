@@ -6,6 +6,8 @@ param(
     [string] $DefaultEnvironmentName = "contoso-dev",
     [string] $DefaultTargetTenantDomain = "contoso.onmicrosoft.com",
     [string] $DefaultMspTenantDomain = "msp.example.com",
+    [string] $DefaultLocation = "australiaeast",
+    [string] $DefaultStaticWebAppLocation = "eastasia",
     [string] $DefaultLicenseAssignmentMode = "DynamicGroup",
     [switch] $WriteTfvars
 )
@@ -149,6 +151,44 @@ $subscription = Select-ItemFromList `
 
 az account set --subscription $subscription.id | Out-Null
 
+$azureLocations = az account list-locations --output json `
+    | ConvertFrom-Json `
+    | Where-Object { $_.metadata.regionType -eq "Physical" } `
+    | Sort-Object displayName
+
+$defaultAzureLocation = $azureLocations | Where-Object { $_.name -eq $DefaultLocation } | Select-Object -First 1
+$recommendedAzureLocations = @()
+if ($defaultAzureLocation) {
+    $recommendedAzureLocations += $defaultAzureLocation
+}
+
+$recommendedAzureLocations += $azureLocations `
+    | Where-Object { $_.metadata.regionCategory -eq "Recommended" -and $_.name -ne $DefaultLocation } `
+    | Select-Object -First 19
+
+$location = Select-ItemFromList `
+    -Prompt "Select the Azure region for core runtime resources" `
+    -Items $recommendedAzureLocations `
+    -Display { param($item) "$($item.displayName) - $($item.name)" }
+
+$staticWebAppLocations = @(
+    [pscustomobject]@{ Name = "eastasia"; DisplayName = "East Asia" },
+    [pscustomobject]@{ Name = "westeurope"; DisplayName = "West Europe" },
+    [pscustomobject]@{ Name = "eastus2"; DisplayName = "East US 2" },
+    [pscustomobject]@{ Name = "westus2"; DisplayName = "West US 2" },
+    [pscustomobject]@{ Name = "centralus"; DisplayName = "Central US" }
+)
+
+$defaultStaticWebAppLocation = $staticWebAppLocations | Where-Object { $_.Name -eq $DefaultStaticWebAppLocation } | Select-Object -First 1
+if ($defaultStaticWebAppLocation) {
+    $staticWebAppLocations = @($defaultStaticWebAppLocation) + @($staticWebAppLocations | Where-Object { $_.Name -ne $DefaultStaticWebAppLocation })
+}
+
+$staticWebAppLocation = Select-ItemFromList `
+    -Prompt "Select the Azure Static Web Apps region" `
+    -Items $staticWebAppLocations `
+    -Display { param($item) "$($item.DisplayName) - $($item.Name)" }
+
 $approvalRecipientEmail = Read-ValueOrDefault `
     -Prompt "MSP approval recipient email" `
     -Default $DefaultApprovalRecipientEmail
@@ -200,8 +240,10 @@ $approvalTokenSigningKey = New-TokenSigningKey
 
 $tfvars = @"
 environment_name = "$environmentName"
+location = "$($location.name)"
 target_tenant_domain = "$targetTenantDomain"
 msp_tenant_domain = "$mspTenantDomain"
+static_web_app_location = "$($staticWebAppLocation.Name)"
 
 graph_tenant_id = "$($tenant.tenantId)"
 graph_client_id = "REPLACE_WITH_BOOTSTRAP_APPLICATION_CLIENT_ID"
@@ -237,6 +279,8 @@ Write-Host "Subscription: $($subscription.name) ($($subscription.id))"
 Write-Host "Account:      $deploymentAccountUpn"
 Write-Host "Path:         $($deploymentPath.Name)"
 Write-Host "Environment:  $environmentName"
+Write-Host "Azure region: $($location.name)"
+Write-Host "SWA region:   $($staticWebAppLocation.Name)"
 Write-Host "Target domain:$targetTenantDomain"
 Write-Host "MSP domain:   $mspTenantDomain"
 Write-Host "Sender UPN:   $approvalSenderUserPrincipalName"

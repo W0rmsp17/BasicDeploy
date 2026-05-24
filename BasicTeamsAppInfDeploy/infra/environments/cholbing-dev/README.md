@@ -33,7 +33,7 @@ Run the discovery script before bootstrap/runtime deployment:
 .\discover-prereqs.ps1
 ```
 
-The script signs in through Azure CLI, lets the actor select tenant and subscription by number, gathers sender/recipient UPN values, generates an approval token signing key, and prints suggested `terraform.tfvars` content.
+The script signs in through Azure CLI, lets the actor select tenant, subscription, core Azure region, and Static Web Apps region by number, gathers sender/recipient UPN values, generates an approval token signing key, and prints suggested `terraform.tfvars` content.
 
 It also asks for the target tenant deployment account UPN and one of four deployment paths:
 

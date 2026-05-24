@@ -27,6 +27,7 @@ Copy-Item .\infra\environments\cholbing-dev\terraform.tfvars.example .\infra\env
 The current `cholbing-dev` environment is a sample environment. Override these values for a real client:
 
 - `environment_name`
+- `location`
 - `target_tenant_domain`
 - `msp_tenant_domain`
 - `static_web_app_location`
