@@ -14,7 +14,7 @@ public sealed partial record SubmitOnboardingRequest
 
     public string? ManagerEmail { get; init; }
 
-    public DateOnly? StartDate { get; init; }
+    public string? StartDate { get; init; }
 
     public string? RequestedProfile { get; init; }
 
@@ -44,7 +44,13 @@ public sealed partial record SubmitOnboardingRequest
             errors.Add("Manager email must be a valid email address.");
         }
 
-        if (StartDate is not null && StartDate.Value < DateOnly.FromDateTime(DateTime.UtcNow.Date))
+        var parsedStartDate = ParseStartDate();
+        if (!string.IsNullOrWhiteSpace(StartDate) && parsedStartDate is null)
+        {
+            errors.Add("Start date must use yyyy-MM-dd format.");
+        }
+
+        if (parsedStartDate is not null && parsedStartDate.Value < DateOnly.FromDateTime(DateTime.UtcNow.Date))
         {
             errors.Add("Start date cannot be in the past.");
         }
@@ -62,6 +68,8 @@ public sealed partial record SubmitOnboardingRequest
         var upnPrefix = $"{firstName}.{lastName}".ToLowerInvariant();
         var normalizedUpnPrefix = UpnUnsafeCharacters().Replace(upnPrefix, string.Empty);
 
+        var parsedStartDate = ParseStartDate();
+
         return new OnboardingRequestRecord
         {
             Id = Guid.NewGuid(),
@@ -72,7 +80,7 @@ public sealed partial record SubmitOnboardingRequest
             JobTitle = JobTitle?.Trim(),
             Department = Department?.Trim(),
             ManagerEmail = ManagerEmail?.Trim(),
-            StartDate = StartDate,
+            StartDate = parsedStartDate,
             RequestedProfile = RequestedProfile?.Trim(),
             Notes = Notes?.Trim(),
             Status = OnboardingRequestStatus.PendingApproval,
@@ -86,4 +94,19 @@ public sealed partial record SubmitOnboardingRequest
 
     [GeneratedRegex("[^a-z0-9._-]", RegexOptions.Compiled)]
     private static partial Regex UpnUnsafeCharacters();
+
+    private DateOnly? ParseStartDate()
+    {
+        if (string.IsNullOrWhiteSpace(StartDate))
+        {
+            return null;
+        }
+
+        return DateOnly.TryParseExact(
+            StartDate.Trim(),
+            "yyyy-MM-dd",
+            out var parsed)
+            ? parsed
+            : null;
+    }
 }

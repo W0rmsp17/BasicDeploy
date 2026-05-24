@@ -28,7 +28,7 @@ public sealed class OnboardingRequestEntity : ITableEntity
 
     public string? ManagerEmail { get; set; }
 
-    public DateTime? StartDate { get; set; }
+    public string? StartDate { get; set; }
 
     public string? RequestedProfile { get; set; }
 
@@ -58,7 +58,7 @@ public sealed class OnboardingRequestEntity : ITableEntity
             JobTitle = request.JobTitle,
             Department = request.Department,
             ManagerEmail = request.ManagerEmail,
-            StartDate = request.StartDate?.ToDateTime(TimeOnly.MinValue),
+            StartDate = request.StartDate?.ToString("yyyy-MM-dd"),
             RequestedProfile = request.RequestedProfile,
             Notes = request.Notes,
             Status = request.Status.ToString(),
@@ -82,7 +82,7 @@ public sealed class OnboardingRequestEntity : ITableEntity
             JobTitle = JobTitle,
             Department = Department,
             ManagerEmail = ManagerEmail,
-            StartDate = StartDate is null ? null : DateOnly.FromDateTime(StartDate.Value),
+            StartDate = string.IsNullOrWhiteSpace(StartDate) ? null : DateOnly.ParseExact(StartDate, "yyyy-MM-dd"),
             RequestedProfile = RequestedProfile,
             Notes = Notes,
             Status = Enum.Parse<OnboardingRequestStatus>(Status),

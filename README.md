@@ -29,6 +29,10 @@ BasicTeamsAppInfDeploy/
   docs/
     architecture.md
     implementation-plan.md
+  teams-app/
+    README.md
+    src/
+    manifest/
   BasicTeamsAppInfDeploy/
     BasicTeamsAppInfDeploy.csproj
 ```
@@ -38,6 +42,7 @@ BasicTeamsAppInfDeploy/
 - [Architecture](BasicTeamsAppInfDeploy/docs/architecture.md)
 - [Implementation Plan](BasicTeamsAppInfDeploy/docs/implementation-plan.md)
 - [Local Development](BasicTeamsAppInfDeploy/docs/local-development.md)
+- [Teams Frontend](BasicTeamsAppInfDeploy/teams-app/README.md)
 
 ## Deployment Modes
 

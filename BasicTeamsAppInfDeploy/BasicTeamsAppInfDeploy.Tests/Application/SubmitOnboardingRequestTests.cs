@@ -39,13 +39,29 @@ public sealed class SubmitOnboardingRequestTests
         {
             FirstName = "Alex",
             LastName = "Wilber",
-            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1))
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd")
         };
 
         var result = request.Validate("CholbingDevoutlook.onmicrosoft.com");
 
         Assert.False(result.IsValid);
         Assert.Contains("Start date cannot be in the past.", result.Errors);
+    }
+
+    [Fact]
+    public void Validate_ReturnsError_WhenStartDateFormatIsInvalid()
+    {
+        var request = new SubmitOnboardingRequest
+        {
+            FirstName = "Alex",
+            LastName = "Wilber",
+            StartDate = "tomorrow"
+        };
+
+        var result = request.Validate("CholbingDevoutlook.onmicrosoft.com");
+
+        Assert.False(result.IsValid);
+        Assert.Contains("Start date must use yyyy-MM-dd format.", result.Errors);
     }
 
     [Fact]
@@ -58,7 +74,7 @@ public sealed class SubmitOnboardingRequestTests
             JobTitle = " Support Analyst ",
             Department = " Operations ",
             ManagerEmail = " manager@CholbingDevoutlook.onmicrosoft.com ",
-            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)),
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
             RequestedProfile = " Standard ",
             Notes = " Test onboarding request "
         };
