@@ -46,7 +46,6 @@ variable "graph_application_permissions" {
   description = "Microsoft Graph application permissions to request and grant."
   default = [
     "Mail.Send",
-    "User.ReadWrite.All",
-    "GroupMember.ReadWrite.All"
+    "User.ReadWrite.All"
   ]
 }

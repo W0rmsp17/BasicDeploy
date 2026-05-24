@@ -17,7 +17,8 @@ Default Graph application permissions:
 
 - `Mail.Send`
 - `User.ReadWrite.All`
-- `GroupMember.ReadWrite.All`
+
+Add `GroupMember.ReadWrite.All` only when `Provisioning__LicenseAssignmentMode=StaticGroup`.
 
 ## What It Does Not Create
 

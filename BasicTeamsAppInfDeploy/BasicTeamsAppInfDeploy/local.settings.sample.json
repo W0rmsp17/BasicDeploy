@@ -15,6 +15,7 @@
     "Provisioning__Provider": "Logging",
     "Provisioning__DefaultUserDomain": "CholbingDevoutlook.onmicrosoft.com",
     "Provisioning__CreateDisabledUsers": "true",
+    "Provisioning__LicenseAssignmentMode": "None",
     "Provisioning__LicenseGroupId": ""
   }
 }

@@ -14,6 +14,9 @@ public sealed class GraphUserProvisioningService(
     ILogger<GraphUserProvisioningService> logger) : IUserProvisioningService
 {
     private readonly bool _createDisabledUsers = configuration.GetValue("Provisioning:CreateDisabledUsers", true);
+    private readonly LicenseAssignmentMode _licenseAssignmentMode = configuration.GetValue(
+        "Provisioning:LicenseAssignmentMode",
+        LicenseAssignmentMode.None);
     private readonly string? _licenseGroupId = configuration["Provisioning:LicenseGroupId"];
 
     public async Task ProvisionUserAsync(OnboardingRequestRecord request, CancellationToken cancellationToken)
@@ -21,16 +24,23 @@ public sealed class GraphUserProvisioningService(
         var accessToken = await graphTokenProvider.GetAccessTokenAsync(cancellationToken);
         var userId = await CreateUserAsync(request, accessToken, cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(_licenseGroupId))
+        if (_licenseAssignmentMode == LicenseAssignmentMode.StaticGroup)
         {
+            if (string.IsNullOrWhiteSpace(_licenseGroupId))
+            {
+                throw new InvalidOperationException(
+                    "Provisioning:LicenseGroupId is required when Provisioning:LicenseAssignmentMode is StaticGroup.");
+            }
+
             await AddUserToGroupAsync(userId, _licenseGroupId, accessToken, cancellationToken);
         }
 
         logger.LogInformation(
-            "Provisioned user {DisplayName} ({UserPrincipalName}) with Graph user id {UserId}.",
+            "Provisioned user {DisplayName} ({UserPrincipalName}) with Graph user id {UserId}. LicenseAssignmentMode: {LicenseAssignmentMode}.",
             request.DisplayName,
             request.UserPrincipalName,
-            userId);
+            userId,
+            _licenseAssignmentMode);
     }
 
     private async Task<string> CreateUserAsync(

@@ -32,7 +32,8 @@
 - Add Azure Storage Queue command for approved requests.
 - Implement `CreateUser` queue trigger.
 - Add Microsoft Graph user creation service.
-- Add optional group assignment for group-based licensing.
+- Add optional static group assignment for group-based licensing.
+- Support dynamic-group licensing mode without group membership writes.
 - Add failure status handling and retry-safe behavior.
 
 ## Phase 5: Teams Frontend

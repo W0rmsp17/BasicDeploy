@@ -40,7 +40,8 @@ Required values:
 | `Provisioning__Provider` | Use `Logging` locally or `Graph` for real user creation |
 | `Provisioning__DefaultUserDomain` | Target tenant user domain |
 | `Provisioning__CreateDisabledUsers` | Whether created users should be disabled by default |
-| `Provisioning__LicenseGroupId` | Optional group for group-based licensing |
+| `Provisioning__LicenseAssignmentMode` | `None`, `DynamicGroup`, or `StaticGroup` |
+| `Provisioning__LicenseGroupId` | Required only when `Provisioning__LicenseAssignmentMode=StaticGroup` |
 
 ## Current Local Endpoints
 

@@ -113,7 +113,10 @@ Default Graph application permissions:
 
 - `Mail.Send`
 - `User.ReadWrite.All`
-- `GroupMember.ReadWrite.All`
+
+Optional Graph application permissions:
+
+- `GroupMember.ReadWrite.All` only when `Provisioning__LicenseAssignmentMode=StaticGroup`.
 
 Bootstrap outputs should map directly to runtime configuration:
 
@@ -222,7 +225,7 @@ Expected responsibilities:
 - Load the approved request.
 - Create the Entra ID user.
 - Set account enabled state based on configuration.
-- Optionally add the user to a configured licensing/security group.
+- Optionally add the user to a configured licensing/security group when static group assignment is selected.
 - Update status to `Provisioned` or `ProvisioningFailed`.
 - Store Graph error details needed for support without exposing secrets.
 
@@ -261,28 +264,34 @@ The MVP approval links are token-based email callbacks. They record the approval
 
 ## Microsoft Graph Permissions
 
-The MVP should require only the permissions needed to create users and optionally add them to a group.
+The MVP should require only the permissions needed for the selected provisioning mode.
 
 Expected Graph operations:
 
 - Send approval email from a dedicated sender mailbox.
 - Create user.
-- Add user to configured group.
+- Add user to configured group only when `Provisioning__LicenseAssignmentMode=StaticGroup`.
 - Optionally read existing users/groups for validation.
 
 Expected application permissions:
 
 - `Mail.Send` for approval email.
 - `User.ReadWrite.All` for user creation.
-- `GroupMember.ReadWrite.All` for group assignment.
+- `GroupMember.ReadWrite.All` for static group assignment only.
 
 Broad directory permissions should be avoided unless a chosen Graph operation requires them.
 
 ## Licensing Approach
 
-The MVP should not directly assign license SKUs. Instead, approved users can be added to a configured Entra group. The client or MSP can attach group-based licensing policy to that group.
+The MVP should not directly assign license SKUs. Licensing is controlled by configuration:
 
-This keeps licensing policy outside the app and avoids making the starter solution responsible for tenant-specific SKU selection.
+| Mode | Behavior | Extra Graph permission |
+| --- | --- | --- |
+| `None` | Create the user only. | None |
+| `DynamicGroup` | Create the user and rely on tenant-managed dynamic group rules. | None |
+| `StaticGroup` | Create the user and add them to `Provisioning__LicenseGroupId`. | `GroupMember.ReadWrite.All` |
+
+This keeps licensing policy outside the app where possible and avoids making the starter solution responsible for tenant-specific SKU selection.
 
 ## Terraform Reuse Model
 
@@ -297,6 +306,7 @@ default_user_domain         = "contoso.com"
 target_tenant_domain        = "contoso.onmicrosoft.com"
 target_tenant_id            = "00000000-0000-0000-0000-000000000000"
 license_group_id            = "00000000-0000-0000-0000-000000000000"
+license_assignment_mode     = "DynamicGroup"
 allowed_submitter_group_id  = "00000000-0000-0000-0000-000000000000"
 create_disabled_users       = true
 provisioning_mode           = "manual-identity"
