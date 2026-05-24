@@ -1,0 +1,9 @@
+graph_tenant_id = "00000000-0000-0000-0000-000000000000"
+graph_client_id = "00000000-0000-0000-0000-000000000000"
+
+approval_recipient_email                = "approver@plutonix.onmicrosoft.com"
+approval_base_url                       = "https://func-onboard-cholbing-dev-example.azurewebsites.net"
+approval_sender_user_principal_name = "onboarding@CholbingDevoutlook.onmicrosoft.com"
+
+license_assignment_mode = "DynamicGroup"
+license_group_id = ""

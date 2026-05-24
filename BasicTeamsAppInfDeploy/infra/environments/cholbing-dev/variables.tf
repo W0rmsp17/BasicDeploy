@@ -1,0 +1,63 @@
+variable "location" {
+  type        = string
+  description = "Azure region for the test deployment."
+  default     = "australiaeast"
+}
+
+variable "graph_tenant_id" {
+  type        = string
+  description = "Target tenant ID for CholbingDevoutlook.onmicrosoft.com."
+}
+
+variable "graph_client_id" {
+  type        = string
+  description = "Graph app registration client ID from bootstrap or manual identity mode."
+}
+
+variable "graph_client_secret_value" {
+  type        = string
+  description = "Graph client secret value for bootstrap testing. Prefer protected variable input."
+  default     = null
+  nullable    = true
+  sensitive   = true
+}
+
+variable "graph_client_secret_key_vault_secret_id" {
+  type        = string
+  description = "Existing Key Vault secret ID containing the Graph client secret."
+  default     = null
+  nullable    = true
+}
+
+variable "approval_recipient_email" {
+  type        = string
+  description = "Approver mailbox in plutonix.onmicrosoft.com."
+}
+
+variable "approval_base_url" {
+  type        = string
+  description = "Public base URL used in approval links. Use a planned Function App URL or custom domain."
+}
+
+variable "approval_sender_user_principal_name" {
+  type        = string
+  description = "Sender mailbox UPN in CholbingDevoutlook.onmicrosoft.com."
+}
+
+variable "approval_token_signing_key" {
+  type        = string
+  description = "HMAC token signing key."
+  sensitive   = true
+}
+
+variable "license_assignment_mode" {
+  type        = string
+  description = "License handling mode: None, DynamicGroup, or StaticGroup."
+  default     = "DynamicGroup"
+}
+
+variable "license_group_id" {
+  type        = string
+  description = "Group object ID used only for StaticGroup mode."
+  default     = ""
+}
