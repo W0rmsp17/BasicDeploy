@@ -1,16 +1,10 @@
-# Cholbing Dev Environment
+# Sample Client Environment
 
-This environment deploys the Azure runtime for the target test tenant:
+This folder is a reusable sample client environment. Copy it or use it as a template when creating a deployment for another target tenant.
 
-```text
-CholbingDevoutlook.onmicrosoft.com
-```
+The environment deploys the Azure runtime into the selected target tenant and subscription. Tenant-specific values belong in the ignored local `terraform.tfvars` file, not in committed Terraform.
 
-Approval email is sent to an actor-supplied mailbox, expected to be in:
-
-```text
-plutonix.onmicrosoft.com
-```
+Approval email is sent to the actor-supplied MSP or service desk mailbox.
 
 ## Required Inputs
 
@@ -57,6 +51,13 @@ To write the local ignored `terraform.tfvars` file:
 ```
 
 Do not run `apply` until the plan and input values have been reviewed.
+
+The root deployment wrapper can sequence these steps for the selected environment:
+
+```powershell
+cd ..\..\..
+.\deploy.ps1
+```
 
 ## Deploy Function Code
 
@@ -134,15 +135,13 @@ If admin consent is missing, sign in with a Global Administrator or suitable pri
 .\test-graph-app.ps1 -AttemptAdminConsent
 ```
 
-Graph approval email also requires the configured `approval_sender_user_principal_name` to have an Exchange Online mailbox. If that user is unlicensed or has no mailbox, Graph `sendMail` will fail even when app consent is correct.
+Graph approval email also requires the configured `approval_sender_user_principal_name` to have an active Exchange Online mailbox. Graph `sendMail` can fail even when app consent is correct if the mailbox is not provisioned yet.
 
-While waiting for mailbox licensing or admin consent, you can smoke-test request storage and approval-link generation by temporarily setting approval notifications to logging:
+Use logging mode for smoke tests when Graph consent or mailbox readiness is not complete:
 
 ```powershell
-az functionapp config appsettings set `
-  --resource-group rg-onboard-cholbing-dev `
-  --name <function-app-name> `
-  --settings Approval__Provider=Logging
+cd ..\..\..
+.\deploy.ps1 -ApprovalProvider Logging -SkipDiscovery -SkipFunctionDeploy -SkipTeamsFrontendDeploy -SkipTeamsManifest -SkipTeamsAppGroup
 ```
 
 Set it back to `Graph` before testing real approval email delivery.
