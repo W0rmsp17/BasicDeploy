@@ -1,3 +1,5 @@
+data "azurerm_client_config" "current" {}
+
 resource "random_string" "suffix" {
   length  = 6
   lower   = true
@@ -10,7 +12,7 @@ locals {
   normalized_prefix = lower(replace("${var.workload_name}-${var.environment_name}", "/[^a-zA-Z0-9]/", ""))
   resource_suffix   = random_string.suffix.result
   storage_name      = substr("${local.normalized_prefix}${local.resource_suffix}", 0, 24)
-  key_vault_name    = substr("kv-${var.workload_name}-${var.environment_name}-${local.resource_suffix}", 0, 24)
+  key_vault_name    = substr("kv${local.normalized_prefix}${local.resource_suffix}", 0, 24)
   function_name     = substr("func-${var.workload_name}-${var.environment_name}-${local.resource_suffix}", 0, 60)
   app_plan_name     = "plan-${var.workload_name}-${var.environment_name}-${local.resource_suffix}"
   app_insights_name = "appi-${var.workload_name}-${var.environment_name}-${local.resource_suffix}"
@@ -57,6 +59,12 @@ resource "azurerm_key_vault" "onboarding" {
   tags                       = var.tags
 }
 
+resource "azurerm_role_assignment" "deployment_key_vault_secrets_officer" {
+  scope                = azurerm_key_vault.onboarding.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
 resource "azurerm_key_vault_secret" "graph_client_secret" {
   count = var.graph_client_secret_key_vault_secret_id == null ? 1 : 0
 
@@ -71,6 +79,10 @@ resource "azurerm_key_vault_secret" "graph_client_secret" {
       error_message = "graph_client_secret_value is required when graph_client_secret_key_vault_secret_id is not provided."
     }
   }
+
+  depends_on = [
+    azurerm_role_assignment.deployment_key_vault_secrets_officer
+  ]
 }
 
 resource "azurerm_key_vault_secret" "approval_token_signing_key" {
@@ -78,6 +90,10 @@ resource "azurerm_key_vault_secret" "approval_token_signing_key" {
   value        = var.approval_token_signing_key
   key_vault_id = azurerm_key_vault.onboarding.id
   content_type = "HMAC key for approval token signing"
+
+  depends_on = [
+    azurerm_role_assignment.deployment_key_vault_secrets_officer
+  ]
 }
 
 resource "azurerm_service_plan" "onboarding" {
