@@ -134,6 +134,8 @@ The sender mailbox UPN is supplied by the deployment actor:
 Approval__SenderUserPrincipalName=onboarding@CholbingDevoutlook.onmicrosoft.com
 ```
 
+`Approval__BaseUrl` is set to a placeholder during the first Terraform apply, then updated post-deploy to the generated Function App URL. This avoids a Terraform dependency cycle between Function App creation and app settings.
+
 ## Proposed Azure Components
 
 | Component | Purpose |

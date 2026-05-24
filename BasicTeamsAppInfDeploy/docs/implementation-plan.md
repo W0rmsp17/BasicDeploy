@@ -55,6 +55,7 @@
   - Optional Entra app registration resources
 - Add bootstrap app registration module for Graph application permissions.
 - Add a sample client environment.
+- Add post-deploy app setting update for `Approval__BaseUrl`.
 - Support bootstrap mode for lab or full-admin deployments.
 - Support manual identity mode for pre-provisioned app registrations and groups.
 - Document required tenant admin consent steps.

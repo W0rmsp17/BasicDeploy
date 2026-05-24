@@ -46,7 +46,8 @@ variable "graph_client_secret_key_vault_secret_id" {
 
 variable "approval_base_url" {
   type        = string
-  description = "Public base URL used to generate approval links. Usually set after Function App hostname is known."
+  description = "Initial public base URL used to generate approval links. Use a placeholder, then run the post-deploy app setting update."
+  default     = "https://pending-post-deploy-update"
 }
 
 variable "approval_recipient_email" {

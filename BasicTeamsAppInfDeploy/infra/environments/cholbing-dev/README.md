@@ -19,7 +19,6 @@ Copy `terraform.tfvars.example` to a local `terraform.tfvars` file and provide:
 - `graph_tenant_id`
 - `graph_client_id`
 - `graph_client_secret_value` or `graph_client_secret_key_vault_secret_id`
-- `approval_base_url`
 - `approval_recipient_email`
 - `approval_sender_user_principal_name`
 - `approval_token_signing_key`
@@ -35,3 +34,20 @@ Copy `terraform.tfvars.example` to a local `terraform.tfvars` file and provide:
 ```
 
 Do not run `apply` until the plan and input values have been reviewed.
+
+## Post-Deploy Approval URL
+
+The first Terraform apply uses a placeholder `Approval__BaseUrl` to avoid a dependency cycle with the generated Function App hostname.
+
+After apply, update the app setting to the generated Function App URL:
+
+```powershell
+$functionAppName = terraform output -raw function_app_name
+$resourceGroupName = terraform output -raw resource_group_name
+$approvalBaseUrl = "https://$(terraform output -raw function_app_default_hostname)"
+
+az functionapp config appsettings set `
+  --resource-group $resourceGroupName `
+  --name $functionAppName `
+  --settings "Approval__BaseUrl=$approvalBaseUrl"
+```

@@ -36,7 +36,8 @@ variable "approval_recipient_email" {
 
 variable "approval_base_url" {
   type        = string
-  description = "Public base URL used in approval links. Use a planned Function App URL or custom domain."
+  description = "Initial public base URL used in approval links. Defaults to a placeholder and should be updated post-deploy."
+  default     = "https://pending-post-deploy-update"
 }
 
 variable "approval_sender_user_principal_name" {
