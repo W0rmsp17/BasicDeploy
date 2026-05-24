@@ -15,9 +15,17 @@ function Assert-Command {
         [string] $Name
     )
 
-    if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-        throw "Required command '$Name' was not found on PATH."
+    if (Get-Command $Name -ErrorAction SilentlyContinue) {
+        return
     }
+
+    $knownAzureCliPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
+    if ($Name -eq "az" -and (Test-Path -LiteralPath (Join-Path $knownAzureCliPath "az.cmd"))) {
+        $env:Path = "$knownAzureCliPath;$env:Path"
+        return
+    }
+
+    throw "Required command '$Name' was not found on PATH."
 }
 
 function Select-ItemFromList {

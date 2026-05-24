@@ -7,6 +7,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if (-not (Get-Command "az" -ErrorAction SilentlyContinue)) {
+    $knownAzureCliPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
+    if (Test-Path -LiteralPath (Join-Path $knownAzureCliPath "az.cmd")) {
+        $env:Path = "$knownAzureCliPath;$env:Path"
+    }
+}
+
+if (-not (Get-Command "az" -ErrorAction SilentlyContinue)) {
+    throw "Required command 'az' was not found on PATH."
+}
+
 if (-not (Test-Path -LiteralPath $TerraformPath)) {
     throw "Terraform executable was not found at '$TerraformPath'."
 }
