@@ -25,6 +25,22 @@ Copy `terraform.tfvars.example` to a local `terraform.tfvars` file and provide:
 
 `terraform.tfvars` is ignored by git.
 
+## Discovery
+
+Run the discovery script before bootstrap/runtime deployment:
+
+```powershell
+.\discover-prereqs.ps1
+```
+
+The script signs in through Azure CLI, lets the actor select tenant and subscription by number, gathers sender/recipient UPN values, generates an approval token signing key, and prints suggested `terraform.tfvars` content.
+
+To write the local ignored `terraform.tfvars` file:
+
+```powershell
+.\discover-prereqs.ps1 -WriteTfvars
+```
+
 ## Commands
 
 ```powershell
