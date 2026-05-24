@@ -35,6 +35,16 @@ Copy `terraform.tfvars.example` to a local `terraform.tfvars` file and provide:
 
 Do not run `apply` until the plan and input values have been reviewed.
 
+## Deploy Function Code
+
+After Terraform apply:
+
+```powershell
+.\deploy-function.ps1
+```
+
+The script builds the .NET Azure Functions project, creates a zip package, deploys it to the Function App from Terraform outputs, and runs `post-deploy.ps1` unless `-SkipPostDeploy` is supplied.
+
 ## Post-Deploy Approval URL
 
 The first Terraform apply uses a placeholder `Approval__BaseUrl` to avoid a dependency cycle with the generated Function App hostname.
