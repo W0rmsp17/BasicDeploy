@@ -42,12 +42,7 @@ The first Terraform apply uses a placeholder `Approval__BaseUrl` to avoid a depe
 After apply, update the app setting to the generated Function App URL:
 
 ```powershell
-$functionAppName = terraform output -raw function_app_name
-$resourceGroupName = terraform output -raw resource_group_name
-$approvalBaseUrl = "https://$(terraform output -raw function_app_default_hostname)"
-
-az functionapp config appsettings set `
-  --resource-group $resourceGroupName `
-  --name $functionAppName `
-  --settings "Approval__BaseUrl=$approvalBaseUrl"
+.\post-deploy.ps1
 ```
+
+The script reads Terraform outputs, builds `https://<function-app-hostname>`, updates `Approval__BaseUrl`, and prints the final value.
