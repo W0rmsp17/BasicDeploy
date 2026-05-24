@@ -2,26 +2,19 @@ using System.Net.Http.Json;
 using BasicTeamsAppInfDeploy.Application;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
 
 namespace BasicTeamsAppInfDeploy.Infrastructure;
 
 public sealed class GraphApprovalNotifier(
     IConfiguration configuration,
     HttpClient httpClient,
+    IGraphTokenProvider graphTokenProvider,
     ILogger<GraphApprovalNotifier> logger) : IApprovalNotifier
 {
-    private static readonly string[] Scopes = ["https://graph.microsoft.com/.default"];
     private readonly string _recipientEmail = configuration["Approval:RecipientEmail"]
         ?? throw new InvalidOperationException("Approval:RecipientEmail is required.");
     private readonly string _senderUserPrincipalName = configuration["Approval:SenderUserPrincipalName"]
         ?? throw new InvalidOperationException("Approval:SenderUserPrincipalName is required when Approval:Provider is Graph.");
-    private readonly string _tenantId = configuration["Graph:TenantId"]
-        ?? throw new InvalidOperationException("Graph:TenantId is required when Approval:Provider is Graph.");
-    private readonly string _clientId = configuration["Graph:ClientId"]
-        ?? throw new InvalidOperationException("Graph:ClientId is required when Approval:Provider is Graph.");
-    private readonly string _clientSecret = configuration["Graph:ClientSecret"]
-        ?? throw new InvalidOperationException("Graph:ClientSecret is required when Approval:Provider is Graph.");
 
     public async Task SendApprovalRequestAsync(
         OnboardingRequestRecord request,
@@ -47,7 +40,7 @@ public sealed class GraphApprovalNotifier(
             </p>
             """;
 
-        var accessToken = await GetAccessTokenAsync(cancellationToken);
+        var accessToken = await graphTokenProvider.GetAccessTokenAsync(cancellationToken);
         using var httpRequest = new HttpRequestMessage(
             HttpMethod.Post,
             $"https://graph.microsoft.com/v1.0/users/{Uri.EscapeDataString(_senderUserPrincipalName)}/sendMail");
@@ -85,21 +78,6 @@ public sealed class GraphApprovalNotifier(
             request.Id,
             _senderUserPrincipalName,
             _recipientEmail);
-    }
-
-    private async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
-    {
-        var app = ConfidentialClientApplicationBuilder
-            .Create(_clientId)
-            .WithClientSecret(_clientSecret)
-            .WithAuthority($"https://login.microsoftonline.com/{_tenantId}")
-            .Build();
-
-        var result = await app
-            .AcquireTokenForClient(Scopes)
-            .ExecuteAsync(cancellationToken);
-
-        return result.AccessToken;
     }
 
     private static string Escape(string? value)

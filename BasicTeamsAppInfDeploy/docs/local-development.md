@@ -37,6 +37,7 @@ Required values:
 | `Graph__ClientId` | App registration client ID with Graph permissions |
 | `Graph__ClientSecret` | App registration secret for local/manual testing |
 | `Storage__OnboardingRequestsTableName` | Azure Table Storage table for onboarding request state |
+| `Provisioning__Provider` | Use `Logging` locally or `Graph` for real user creation |
 | `Provisioning__DefaultUserDomain` | Target tenant user domain |
 | `Provisioning__CreateDisabledUsers` | Whether created users should be disabled by default |
 | `Provisioning__LicenseGroupId` | Optional group for group-based licensing |
@@ -71,4 +72,4 @@ Set `Approval__Provider` to `Logging` for local development without sending emai
 
 When using `Graph`, the app registration needs `Mail.Send` application permission and should be restricted to the configured sender mailbox in production.
 
-The provisioning service remains a logging stub until the Microsoft Graph user creation phase.
+Set `Provisioning__Provider` to `Logging` for local development without creating users. Set it to `Graph` to create users and optionally add them to the configured licensing group.

@@ -226,6 +226,8 @@ Expected responsibilities:
 - Update status to `Provisioned` or `ProvisioningFailed`.
 - Store Graph error details needed for support without exposing secrets.
 
+The default runtime should use `Provisioning__Provider=Logging` for local development and `Provisioning__Provider=Graph` for tenant testing or deployment.
+
 ## Default MVP Fields
 
 The first version should keep the onboarding form narrow:

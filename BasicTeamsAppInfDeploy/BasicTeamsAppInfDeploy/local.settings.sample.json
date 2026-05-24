@@ -12,6 +12,7 @@
     "Graph__ClientId": "00000000-0000-0000-0000-000000000000",
     "Graph__ClientSecret": "replace-with-local-secret-only",
     "Storage__OnboardingRequestsTableName": "OnboardingRequests",
+    "Provisioning__Provider": "Logging",
     "Provisioning__DefaultUserDomain": "CholbingDevoutlook.onmicrosoft.com",
     "Provisioning__CreateDisabledUsers": "true",
     "Provisioning__LicenseGroupId": ""
