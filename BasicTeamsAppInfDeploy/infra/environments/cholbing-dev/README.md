@@ -35,6 +35,13 @@ Run the discovery script before bootstrap/runtime deployment:
 
 The script signs in through Azure CLI, lets the actor select tenant and subscription by number, gathers sender/recipient UPN values, generates an approval token signing key, and prints suggested `terraform.tfvars` content.
 
+It also asks for the target tenant deployment account UPN and one of four deployment paths:
+
+1. Bootstrap app registration and deploy runtime
+2. Use manually configured app registration and deploy runtime
+3. Bootstrap app registration only
+4. Deploy runtime only from existing app registration values
+
 To write the local ignored `terraform.tfvars` file:
 
 ```powershell

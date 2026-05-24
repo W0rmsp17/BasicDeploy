@@ -1,5 +1,6 @@
 param(
     [string] $TerraformPath = "..\..\..\..\terraform.exe",
+    [string] $DefaultDeploymentAccountUpn = "cholbing@CholbingDevoutlook.onmicrosoft.com",
     [string] $DefaultApprovalRecipientEmail = "cholbing@plutonix.onmicrosoft.com",
     [string] $DefaultApprovalSenderUserPrincipalName = "cholbing@CholbingDevoutlook.onmicrosoft.com",
     [string] $DefaultLicenseAssignmentMode = "DynamicGroup",
@@ -86,9 +87,38 @@ if (-not (Test-Path -LiteralPath $TerraformPath)) {
 }
 
 Write-Host "This script performs discovery only. It does not create Azure or Entra resources."
-Write-Host "Sign in with the target tenant GA or privileged deployment account when prompted."
 Write-Host ""
 
+$deploymentAccountUpn = Read-ValueOrDefault `
+    -Prompt "Target tenant deployment account UPN (GA or privileged deployment account)" `
+    -Default $DefaultDeploymentAccountUpn
+
+$deploymentPaths = @(
+    [pscustomobject]@{
+        Name = "Bootstrap app registration and deploy runtime"
+        Key = "BootstrapAndRuntime"
+    },
+    [pscustomobject]@{
+        Name = "Use manually configured app registration and deploy runtime"
+        Key = "ManualAppRegistrationAndRuntime"
+    },
+    [pscustomobject]@{
+        Name = "Bootstrap app registration only"
+        Key = "BootstrapOnly"
+    },
+    [pscustomobject]@{
+        Name = "Deploy runtime only from existing app registration values"
+        Key = "RuntimeOnly"
+    }
+)
+
+$deploymentPath = Select-ItemFromList `
+    -Prompt "Select deployment path" `
+    -Items $deploymentPaths `
+    -Display { param($item) $item.Name }
+
+Write-Host ""
+Write-Host "Sign in as $deploymentAccountUpn when prompted."
 az login --allow-no-subscriptions | Out-Null
 
 $tenants = az account tenant list --output json | ConvertFrom-Json
@@ -177,6 +207,8 @@ Write-Host ""
 Write-Host "Discovery summary"
 Write-Host "Tenant:       $($tenant.displayName) ($($tenant.tenantId))"
 Write-Host "Subscription: $($subscription.name) ($($subscription.id))"
+Write-Host "Account:      $deploymentAccountUpn"
+Write-Host "Path:         $($deploymentPath.Name)"
 Write-Host "Sender UPN:   $approvalSenderUserPrincipalName"
 Write-Host "Approver:     $approvalRecipientEmail"
 Write-Host "License mode: $selectedLicenseMode"
