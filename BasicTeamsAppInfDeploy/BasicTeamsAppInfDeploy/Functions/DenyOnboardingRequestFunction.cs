@@ -33,6 +33,7 @@ public sealed class DenyOnboardingRequestFunction(
             OnboardingRequestStatus.PendingApproval,
             OnboardingRequestStatus.Denied,
             "Denied by email callback.",
+            "EmailLink",
             cancellationToken);
 
         if (!denied)

@@ -24,6 +24,7 @@ public sealed class InMemoryOnboardingRequestStore : IOnboardingRequestStore
         OnboardingRequestStatus expectedStatus,
         OnboardingRequestStatus newStatus,
         string? statusMessage,
+        string? approvalMethod,
         CancellationToken cancellationToken)
     {
         if (!_requests.TryGetValue(requestId, out var current) || current.Status != expectedStatus)
@@ -35,6 +36,10 @@ public sealed class InMemoryOnboardingRequestStore : IOnboardingRequestStore
         {
             Status = newStatus,
             StatusMessage = statusMessage,
+            ApprovalMethod = approvalMethod,
+            ApprovedOrDeniedOn = newStatus is OnboardingRequestStatus.Approved or OnboardingRequestStatus.Denied
+                ? DateTimeOffset.UtcNow
+                : current.ApprovedOrDeniedOn,
             UpdatedOn = DateTimeOffset.UtcNow
         };
 

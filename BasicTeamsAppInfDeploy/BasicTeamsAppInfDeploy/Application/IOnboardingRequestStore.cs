@@ -11,5 +11,6 @@ public interface IOnboardingRequestStore
         OnboardingRequestStatus expectedStatus,
         OnboardingRequestStatus newStatus,
         string? statusMessage,
+        string? approvalMethod,
         CancellationToken cancellationToken);
 }

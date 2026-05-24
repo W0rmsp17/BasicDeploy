@@ -38,6 +38,10 @@ public sealed class OnboardingRequestEntity : ITableEntity
 
     public string? StatusMessage { get; set; }
 
+    public string? ApprovalMethod { get; set; }
+
+    public DateTimeOffset? ApprovedOrDeniedOn { get; set; }
+
     public DateTimeOffset CreatedOn { get; set; }
 
     public DateTimeOffset UpdatedOn { get; set; }
@@ -59,6 +63,8 @@ public sealed class OnboardingRequestEntity : ITableEntity
             Notes = request.Notes,
             Status = request.Status.ToString(),
             StatusMessage = request.StatusMessage,
+            ApprovalMethod = request.ApprovalMethod,
+            ApprovedOrDeniedOn = request.ApprovedOrDeniedOn,
             CreatedOn = request.CreatedOn,
             UpdatedOn = request.UpdatedOn
         };
@@ -81,6 +87,8 @@ public sealed class OnboardingRequestEntity : ITableEntity
             Notes = Notes,
             Status = Enum.Parse<OnboardingRequestStatus>(Status),
             StatusMessage = StatusMessage,
+            ApprovalMethod = ApprovalMethod,
+            ApprovedOrDeniedOn = ApprovedOrDeniedOn,
             CreatedOn = CreatedOn,
             UpdatedOn = UpdatedOn
         };

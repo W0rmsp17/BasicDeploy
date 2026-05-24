@@ -28,6 +28,10 @@ public sealed record OnboardingRequestRecord
 
     public string? StatusMessage { get; init; }
 
+    public string? ApprovalMethod { get; init; }
+
+    public DateTimeOffset? ApprovedOrDeniedOn { get; init; }
+
     public required DateTimeOffset CreatedOn { get; init; }
 
     public DateTimeOffset UpdatedOn { get; init; }

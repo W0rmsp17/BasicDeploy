@@ -55,6 +55,7 @@ public sealed class TableStorageOnboardingRequestStore : IOnboardingRequestStore
         OnboardingRequestStatus expectedStatus,
         OnboardingRequestStatus newStatus,
         string? statusMessage,
+        string? approvalMethod,
         CancellationToken cancellationToken)
     {
         await _tableClient.CreateIfNotExistsAsync(cancellationToken);
@@ -75,6 +76,12 @@ public sealed class TableStorageOnboardingRequestStore : IOnboardingRequestStore
 
             entity.Status = newStatus.ToString();
             entity.StatusMessage = statusMessage;
+            entity.ApprovalMethod = approvalMethod;
+            if (newStatus is OnboardingRequestStatus.Approved or OnboardingRequestStatus.Denied)
+            {
+                entity.ApprovedOrDeniedOn = DateTimeOffset.UtcNow;
+            }
+
             entity.UpdatedOn = DateTimeOffset.UtcNow;
 
             await _tableClient.UpdateEntityAsync(

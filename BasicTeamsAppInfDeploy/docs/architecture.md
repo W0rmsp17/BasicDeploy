@@ -74,6 +74,8 @@ In this mode, Terraform and setup scripts may create or configure:
 - App registration or service principal used for Graph provisioning.
 - Required Microsoft Graph application permissions.
 - Admin consent in the target tenant.
+- Dedicated sender mailbox configuration for approval emails.
+- Optional Exchange application access policy to restrict Graph `Mail.Send` to the sender mailbox.
 - Storage tables and queues.
 - Function app settings.
 
@@ -94,6 +96,7 @@ graph_client_id         = "00000000-0000-0000-0000-000000000000"
 graph_client_secret_ref = "https://vault-name.vault.azure.net/secrets/graph-client-secret"
 license_group_id        = "00000000-0000-0000-0000-000000000000"
 approval_email          = "approver@plutonix.onmicrosoft.com"
+approval_sender_upn     = "onboarding@CholbingDevoutlook.onmicrosoft.com"
 ```
 
 Terraform then deploys the Azure runtime and consumes the supplied IDs and secret references without owning the privileged Entra configuration.
@@ -112,6 +115,37 @@ This mode should be the preferred path for production clients that require chang
 | Application Insights | Logs, traces, and operational diagnostics |
 | Microsoft Graph | User creation and group membership operations |
 | Terraform | Repeatable per-client infrastructure deployment |
+
+## Approval Email
+
+The MVP uses Microsoft Graph `sendMail` for approval notifications.
+
+The target tenant should provide a dedicated sender mailbox, for example:
+
+```text
+onboarding@CholbingDevoutlook.onmicrosoft.com
+```
+
+The Azure Functions app sends mail through:
+
+```text
+POST /users/{senderUserPrincipalName}/sendMail
+```
+
+Required configuration:
+
+- `Approval__Provider=Graph`
+- `Approval__SenderUserPrincipalName`
+- `Approval__RecipientEmail`
+- `Graph__TenantId`
+- `Graph__ClientId`
+- `Graph__ClientSecret` or a Key Vault-backed equivalent
+
+Required Microsoft Graph application permission:
+
+- `Mail.Send`
+
+Because `Mail.Send` application permission can be broad, production deployments should restrict the app to the dedicated sender mailbox with an Exchange application access policy or equivalent control.
 
 ## Function Responsibilities
 
@@ -193,17 +227,26 @@ Recommended controls:
 - Keep approval and provisioning idempotent.
 - Create users as disabled by default unless the deployment explicitly opts into enabled accounts.
 
+The MVP approval links are token-based email callbacks. They record the approval method and timestamp, but they do not prove the named human approver unless interactive sign-in is added to the approval callback.
+
 ## Microsoft Graph Permissions
 
 The MVP should require only the permissions needed to create users and optionally add them to a group.
 
 Expected Graph operations:
 
+- Send approval email from a dedicated sender mailbox.
 - Create user.
 - Add user to configured group.
 - Optionally read existing users/groups for validation.
 
-The exact permission set should be finalized during implementation and documented in deployment notes. Broad directory permissions should be avoided unless a chosen Graph operation requires them.
+Expected application permissions:
+
+- `Mail.Send` for approval email.
+- `User.ReadWrite.All` for user creation.
+- `GroupMember.ReadWrite.All` for group assignment.
+
+Broad directory permissions should be avoided unless a chosen Graph operation requires them.
 
 ## Licensing Approach
 
@@ -219,6 +262,7 @@ Terraform should support repeatable per-client deployment with variables such as
 client_name                 = "contoso"
 location                    = "australiaeast"
 approval_email              = "service-desk@msp.example"
+approval_sender_upn         = "onboarding@contoso.com"
 default_user_domain         = "contoso.com"
 target_tenant_domain        = "contoso.onmicrosoft.com"
 target_tenant_id            = "00000000-0000-0000-0000-000000000000"

@@ -28,9 +28,14 @@ Required values:
 | --- | --- |
 | `AzureWebJobsStorage` | Storage connection for Functions runtime and queue trigger |
 | `FUNCTIONS_WORKER_RUNTIME` | Must be `dotnet-isolated` |
+| `Approval__Provider` | Use `Logging` locally or `Graph` for real Graph sendMail |
 | `Approval__BaseUrl` | Base URL used when generating approval links |
 | `Approval__RecipientEmail` | MSP approval recipient |
+| `Approval__SenderUserPrincipalName` | Dedicated target tenant mailbox used as the Graph sendMail sender |
 | `Approval__TokenSigningKey` | HMAC key used to sign approval tokens |
+| `Graph__TenantId` | Target tenant ID for app-only Graph auth |
+| `Graph__ClientId` | App registration client ID with Graph permissions |
+| `Graph__ClientSecret` | App registration secret for local/manual testing |
 | `Storage__OnboardingRequestsTableName` | Azure Table Storage table for onboarding request state |
 | `Provisioning__DefaultUserDomain` | Target tenant user domain |
 | `Provisioning__CreateDisabledUsers` | Whether created users should be disabled by default |
@@ -62,4 +67,8 @@ The initial implementation exposes these Azure Functions:
 }
 ```
 
-The current notifier and provisioner are logging stubs. Storage persistence, real email delivery, and Microsoft Graph provisioning will be added in later phases.
+Set `Approval__Provider` to `Logging` for local development without sending email. Set it to `Graph` to send approval email through Microsoft Graph `sendMail`.
+
+When using `Graph`, the app registration needs `Mail.Send` application permission and should be restricted to the configured sender mailbox in production.
+
+The provisioning service remains a logging stub until the Microsoft Graph user creation phase.

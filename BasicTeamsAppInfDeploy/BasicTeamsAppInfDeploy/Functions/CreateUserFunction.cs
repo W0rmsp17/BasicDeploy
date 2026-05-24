@@ -28,6 +28,7 @@ public sealed class CreateUserFunction(
             OnboardingRequestStatus.Approved,
             OnboardingRequestStatus.Provisioning,
             "Provisioning started.",
+            null,
             cancellationToken);
 
         if (!markedProvisioning)
@@ -47,6 +48,7 @@ public sealed class CreateUserFunction(
                 OnboardingRequestStatus.Provisioning,
                 OnboardingRequestStatus.Provisioned,
                 "Provisioning completed.",
+                null,
                 cancellationToken);
         }
         catch (Exception ex)
@@ -58,6 +60,7 @@ public sealed class CreateUserFunction(
                 OnboardingRequestStatus.Provisioning,
                 OnboardingRequestStatus.ProvisioningFailed,
                 ex.Message,
+                null,
                 cancellationToken);
 
             throw;

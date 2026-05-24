@@ -37,6 +37,7 @@ public sealed class ApproveOnboardingRequestFunction(
             OnboardingRequestStatus.PendingApproval,
             OnboardingRequestStatus.Approved,
             "Approved by email callback.",
+            "EmailLink",
             cancellationToken);
 
         if (!approved)

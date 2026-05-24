@@ -18,10 +18,13 @@
 ## Phase 3: Email Approval
 
 - Implement approval token generation and validation.
-- Implement email notification service.
+- Implement Microsoft Graph `sendMail` notification service.
+- Configure dedicated sender mailbox UPN.
+- Document `Mail.Send` admin consent and sender mailbox restriction expectations.
 - Add `ApproveOnboardingRequest`.
 - Add `DenyOnboardingRequest`.
 - Ensure approval and denial are idempotent.
+- Record approval method and approval/denial timestamp.
 - Add tests for token expiry, duplicate approval, and denial.
 
 ## Phase 4: Provisioning Worker
@@ -78,8 +81,7 @@
 
 ## Open Decisions
 
-- Email provider: Microsoft Graph sendMail, Azure Communication Services Email, or SMTP-compatible service.
 - Auth model for the Teams frontend.
 - Whether bootstrap mode should create the Entra app registration through Terraform, a setup script, or both.
-- Whether approval links should require interactive sign-in in addition to one-time token validation.
+- Whether approval links should require interactive sign-in in addition to one-time token validation for named approver audit.
 - Whether the first implementation targets Azure Functions isolated worker only.
