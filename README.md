@@ -81,6 +81,7 @@ Implementers can deploy from this repository or from their own fork:
 - Node.js and npm.
 - Microsoft 365 account with privileges to grant Graph application consent, or pre-created app registration values.
 - Licensed Exchange Online mailbox for the configured approval sender UPN.
+- Teams Administrator role for publishing and assigning the Teams app package.
 
 ## Setup Paths
 

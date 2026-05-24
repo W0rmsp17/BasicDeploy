@@ -391,3 +391,4 @@ override.tf.json
 .env
 .env.*
 !.env.example
+.modules/

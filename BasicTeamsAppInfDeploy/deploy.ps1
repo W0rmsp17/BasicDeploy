@@ -12,7 +12,11 @@ param(
     [switch] $SkipFunctionDeploy,
     [switch] $SkipTeamsFrontendDeploy,
     [switch] $SkipTeamsManifest,
+    [switch] $SkipTeamsPackage,
     [switch] $SkipTeamsAppGroup,
+    [switch] $PublishTeamsApp,
+    [string] $TeamsAppAssignmentGroupId = "",
+    [string] $TeamsAppSetupPolicyName = "M365OnboardingSetup",
     [switch] $RunGraphReadiness,
     [switch] $AutoApprove
 )
@@ -110,6 +114,14 @@ if (-not [string]::IsNullOrWhiteSpace($RepositoryUrl)) {
         $forwardedArgs += @("-TerraformPath", $TerraformPath)
     }
 
+    if (-not [string]::IsNullOrWhiteSpace($TeamsAppAssignmentGroupId)) {
+        $forwardedArgs += @("-TeamsAppAssignmentGroupId", $TeamsAppAssignmentGroupId)
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($TeamsAppSetupPolicyName)) {
+        $forwardedArgs += @("-TeamsAppSetupPolicyName", $TeamsAppSetupPolicyName)
+    }
+
     foreach ($switchName in @(
         "WriteTfvars",
         "SkipDiscovery",
@@ -117,7 +129,9 @@ if (-not [string]::IsNullOrWhiteSpace($RepositoryUrl)) {
         "SkipFunctionDeploy",
         "SkipTeamsFrontendDeploy",
         "SkipTeamsManifest",
+        "SkipTeamsPackage",
         "SkipTeamsAppGroup",
+        "PublishTeamsApp",
         "RunGraphReadiness",
         "AutoApprove"
     )) {
@@ -192,6 +206,10 @@ try {
         & ".\new-teams-manifest.ps1" -TerraformPath $resolvedTerraformPath
     }
 
+    if (-not $SkipTeamsPackage) {
+        & ".\new-teams-package.ps1"
+    }
+
     if (-not $SkipTeamsAppGroup) {
         $groupArgs = @{}
         if (-not [string]::IsNullOrWhiteSpace($TeamsAppUserPrincipalName)) {
@@ -199,6 +217,22 @@ try {
         }
 
         & ".\ensure-teams-app-group.ps1" @groupArgs
+    }
+
+    if ($PublishTeamsApp) {
+        $publishArgs = @{
+            AppSetupPolicyName = $TeamsAppSetupPolicyName
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($TeamsAppUserPrincipalName)) {
+            $publishArgs.TargetUserPrincipalName = $TeamsAppUserPrincipalName
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($TeamsAppAssignmentGroupId)) {
+            $publishArgs.AssignmentGroupId = $TeamsAppAssignmentGroupId
+        }
+
+        & ".\publish-teams-app.ps1" @publishArgs
     }
 
     if ($RunGraphReadiness) {

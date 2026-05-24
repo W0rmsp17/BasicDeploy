@@ -29,6 +29,7 @@ For a full lab/bootstrap deployment, the operator usually needs:
 
 - Azure subscription `Owner`, or `Contributor` plus permission to create role assignments.
 - Microsoft Entra role capable of granting Graph application consent, such as Global Administrator or Privileged Role Administrator.
+- Teams Administrator for publishing the Teams app package and assigning Teams app setup policies.
 - Access to a licensed Exchange Online mailbox that will be used as the approval sender.
 
 For manual identity mode, the deployment actor can use lower Azure privileges if the privileged Entra app registration, secret, consent, and optional group IDs are supplied by another team.
@@ -116,7 +117,30 @@ Create the uploadable Teams app package:
 .\infra\environments\cholbing-dev\new-teams-package.ps1
 ```
 
-Upload or publish this package in Teams admin center. Then use the generated Entra group for Teams app assignment or setup policy targeting.
+Publish the package and assign it to the Teams app group:
+
+```powershell
+.\infra\environments\cholbing-dev\publish-teams-app.ps1
+```
+
+The script uploads the generated package as an organization app, creates a Teams setup policy, pins the app, and assigns that policy to the Entra group. It uses Microsoft Teams PowerShell with device-code authentication.
+
+The same step can be run from the main deployment wrapper:
+
+```powershell
+.\deploy.ps1 -PublishTeamsApp -TeamsAppUserPrincipalName user@contoso.onmicrosoft.com
+```
+
+Manual upload is also supported from Teams admin center:
+
+1. Open Teams admin center.
+2. Go to **Teams apps** -> **Manage apps**.
+3. Select **Upload new app**.
+4. Upload `teams-app/manifest/.generated/m365-onboarding-teams-app.zip`.
+
+![Teams admin apps](../../img/Teams%20Admin.png)
+
+![Teams app package upload](../../img/TeamsAppPackageUpload.png)
 
 ## Runtime Validation
 

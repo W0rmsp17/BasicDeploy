@@ -117,6 +117,14 @@ Package the Teams app manifest and icon assets:
 
 The generated package is written under `teams-app\manifest\.generated\m365-onboarding-teams-app.zip`.
 
+Publish the Teams app package and assign a Teams setup policy to the assignment group:
+
+```powershell
+.\publish-teams-app.ps1
+```
+
+The script uses Microsoft Teams PowerShell with device-code authentication. The signed-in account needs a Teams-capable license and the Teams Administrator role.
+
 ## Teams App Assignment Group
 
 Create or update the target tenant Entra group used to scope access to the Teams app:
