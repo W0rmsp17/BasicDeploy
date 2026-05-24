@@ -52,6 +52,7 @@
   - Key Vault
   - App settings
   - Optional Entra app registration resources
+- Add bootstrap app registration module for Graph application permissions.
 - Add a sample client environment.
 - Support bootstrap mode for lab or full-admin deployments.
 - Support manual identity mode for pre-provisioned app registrations and groups.

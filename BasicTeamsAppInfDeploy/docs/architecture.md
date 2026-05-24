@@ -74,10 +74,12 @@ In this mode, Terraform and setup scripts may create or configure:
 - App registration or service principal used for Graph provisioning.
 - Required Microsoft Graph application permissions.
 - Admin consent in the target tenant.
-- Dedicated sender mailbox configuration for approval emails.
+- Approval sender mailbox UPN as a deployment input.
 - Optional Exchange application access policy to restrict Graph `Mail.Send` to the sender mailbox.
 - Storage tables and queues.
 - Function app settings.
+
+The initial bootstrap app registration module can create the app registration, service principal, optional client secret, Key Vault secret value, required Microsoft Graph permission declarations, and Graph app role assignments. It expects an existing Key Vault ID for secret handoff. It does not create the Exchange Online mailbox or mailbox restriction policy. The actor supplies the sender mailbox UPN during deployment.
 
 Expected target tenant setup access:
 
@@ -102,6 +104,32 @@ approval_sender_upn     = "onboarding@CholbingDevoutlook.onmicrosoft.com"
 Terraform then deploys the Azure runtime and consumes the supplied IDs and secret references without owning the privileged Entra configuration.
 
 This mode should be the preferred path for production clients that require change control over app registrations, admin consent, and licensing groups.
+
+## App Registration Bootstrap
+
+The bootstrap app registration pipeline should create a target-tenant application identity for the Azure Functions app.
+
+Default Graph application permissions:
+
+- `Mail.Send`
+- `User.ReadWrite.All`
+- `GroupMember.ReadWrite.All`
+
+Bootstrap outputs should map directly to runtime configuration:
+
+| Bootstrap output | Runtime setting |
+| --- | --- |
+| `tenant_id` | `Graph__TenantId` |
+| `application_client_id` | `Graph__ClientId` |
+| `client_secret_key_vault_secret_id` | `Graph__ClientSecret` Key Vault reference |
+
+The generated client secret is not output as a raw value. It is stored in Key Vault and referenced by the Function App. Because Terraform creates the app password and Key Vault secret, the secret value still exists in Terraform state during bootstrap; production deployments should use protected remote state or manual identity mode.
+
+The sender mailbox UPN is supplied by the deployment actor:
+
+```text
+Approval__SenderUserPrincipalName=onboarding@CholbingDevoutlook.onmicrosoft.com
+```
 
 ## Proposed Azure Components
 
