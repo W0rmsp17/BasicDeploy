@@ -1,6 +1,7 @@
 environment_name     = "contoso-dev"
 target_tenant_domain = "contoso.onmicrosoft.com"
 msp_tenant_domain    = "msp.example.com"
+static_web_app_location = "eastasia"
 
 graph_tenant_id = "00000000-0000-0000-0000-000000000000"
 graph_client_id = "00000000-0000-0000-0000-000000000000"

@@ -29,6 +29,7 @@ The current `cholbing-dev` environment is a sample environment. Override these v
 - `environment_name`
 - `target_tenant_domain`
 - `msp_tenant_domain`
+- `static_web_app_location`
 - `graph_tenant_id`
 - `graph_client_id`
 - Graph client secret source

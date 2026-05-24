@@ -17,6 +17,7 @@ module "runtime" {
   approval_token_signing_key              = var.approval_token_signing_key
   license_assignment_mode                 = var.license_assignment_mode
   license_group_id                        = var.license_group_id
+  static_web_app_location                 = var.static_web_app_location
 
   tags = {
     workload     = "m365-onboarding"

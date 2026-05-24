@@ -121,7 +121,7 @@ resource "azurerm_application_insights" "onboarding" {
 resource "azurerm_static_web_app" "teams_frontend" {
   name                = local.static_web_app_name
   resource_group_name = azurerm_resource_group.onboarding.name
-  location            = azurerm_resource_group.onboarding.location
+  location            = var.static_web_app_location
   sku_tier            = var.static_web_app_sku_tier
   sku_size            = var.static_web_app_sku_size
   tags                = var.tags

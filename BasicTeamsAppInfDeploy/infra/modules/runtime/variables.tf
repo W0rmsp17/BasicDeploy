@@ -88,6 +88,12 @@ variable "create_disabled_users" {
   default     = true
 }
 
+variable "static_web_app_location" {
+  type        = string
+  description = "Azure Static Web Apps region. Static Web Apps is not available in every Azure region."
+  default     = "eastasia"
+}
+
 variable "static_web_app_sku_tier" {
   type        = string
   description = "Azure Static Web Apps SKU tier for the Teams frontend."

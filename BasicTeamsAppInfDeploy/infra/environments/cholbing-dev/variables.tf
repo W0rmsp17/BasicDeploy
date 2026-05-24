@@ -85,3 +85,9 @@ variable "license_group_id" {
   description = "Group object ID used only for StaticGroup mode."
   default     = ""
 }
+
+variable "static_web_app_location" {
+  type        = string
+  description = "Azure Static Web Apps region. Supported values currently include centralus, eastus2, westus2, westeurope, and eastasia."
+  default     = "eastasia"
+}
