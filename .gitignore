@@ -361,3 +361,25 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Azure Functions local settings
+local.settings.json
+*.local.settings.json
+
+# Terraform local state and provider cache
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local environment files
+.env
+.env.*
+!.env.example

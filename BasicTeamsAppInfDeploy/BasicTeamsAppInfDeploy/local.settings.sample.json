@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "Approval__BaseUrl": "http://localhost:7071",
+    "Approval__RecipientEmail": "approver@plutonix.onmicrosoft.com",
+    "Approval__TokenSigningKey": "replace-with-a-strong-local-secret",
+    "Storage__OnboardingRequestsTableName": "OnboardingRequests",
+    "Provisioning__DefaultUserDomain": "CholbingDevoutlook.onmicrosoft.com",
+    "Provisioning__CreateDisabledUsers": "true",
+    "Provisioning__LicenseGroupId": ""
+  }
+}
