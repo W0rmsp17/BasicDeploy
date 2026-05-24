@@ -370,6 +370,7 @@ FodyWeavers.xsd
 # Azure Functions local settings
 local.settings.json
 *.local.settings.json
+func-local.*.log
 
 # Terraform local state and provider cache
 **/.terraform/*

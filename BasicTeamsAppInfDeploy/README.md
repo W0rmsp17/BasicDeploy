@@ -71,3 +71,5 @@ Some tenant controls remain intentionally explicit:
 - Ensure the configured sender UPN has an Exchange Online mailbox.
 - Upload or publish the generated Teams app package.
 - Use the generated Entra group for Teams app availability or setup policy assignment.
+
+See [Deployment Guide](docs/deployment.md) for the full setup sequence and [Troubleshooting](docs/troubleshooting.md) for common tenant/runtime issues.
