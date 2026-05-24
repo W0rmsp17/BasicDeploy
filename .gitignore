@@ -368,6 +368,7 @@ local.settings.json
 
 # Terraform local state and provider cache
 **/.terraform/*
+terraform.exe
 *.tfstate
 *.tfstate.*
 crash.log
