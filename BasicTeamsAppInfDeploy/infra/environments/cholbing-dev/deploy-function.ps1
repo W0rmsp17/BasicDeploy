@@ -2,7 +2,8 @@ param(
     [string] $TerraformPath = "..\..\..\..\terraform.exe",
     [string] $ProjectPath = "..\..\..\BasicTeamsAppInfDeploy\BasicTeamsAppInfDeploy.csproj",
     [string] $Configuration = "Release",
-    [switch] $SkipPostDeploy
+    [switch] $SkipPostDeploy,
+    [switch] $SkipVerification
 )
 
 $ErrorActionPreference = "Stop"
@@ -67,4 +68,8 @@ Write-Host "Deployed package to Function App '$functionAppName'."
 
 if (-not $SkipPostDeploy) {
     & (Join-Path $PSScriptRoot "post-deploy.ps1") -TerraformPath $TerraformPath
+}
+
+if (-not $SkipVerification) {
+    & (Join-Path $PSScriptRoot "test-function-deployment.ps1") -TerraformPath $TerraformPath
 }

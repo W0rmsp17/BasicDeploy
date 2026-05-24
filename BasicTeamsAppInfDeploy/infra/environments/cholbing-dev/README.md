@@ -68,6 +68,14 @@ After Terraform apply:
 
 The script builds the .NET Azure Functions project, creates a zip package, deploys it to the Function App from Terraform outputs, and runs `post-deploy.ps1` unless `-SkipPostDeploy` is supplied.
 
+It also runs `test-function-deployment.ps1` unless `-SkipVerification` is supplied. The verification restarts the Function App, checks the host state, and confirms Azure discovered the expected Functions.
+
+To run verification on its own:
+
+```powershell
+.\test-function-deployment.ps1
+```
+
 ## Post-Deploy Approval URL
 
 The first Terraform apply uses a placeholder `Approval__BaseUrl` to avoid a dependency cycle with the generated Function App hostname.
@@ -79,3 +87,30 @@ After apply, update the app setting to the generated Function App URL:
 ```
 
 The script reads Terraform outputs, builds `https://<function-app-hostname>`, updates `Approval__BaseUrl`, and prints the final value.
+
+## Graph Readiness
+
+Before testing Graph email or Graph user creation, verify the app registration:
+
+```powershell
+.\test-graph-app.ps1
+```
+
+If admin consent is missing, sign in with a Global Administrator or suitable privileged Entra role and run:
+
+```powershell
+.\test-graph-app.ps1 -AttemptAdminConsent
+```
+
+Graph approval email also requires the configured `approval_sender_user_principal_name` to have an Exchange Online mailbox. If that user is unlicensed or has no mailbox, Graph `sendMail` will fail even when app consent is correct.
+
+While waiting for mailbox licensing or admin consent, you can smoke-test request storage and approval-link generation by temporarily setting approval notifications to logging:
+
+```powershell
+az functionapp config appsettings set `
+  --resource-group rg-onboard-cholbing-dev `
+  --name <function-app-name> `
+  --settings Approval__Provider=Logging
+```
+
+Set it back to `Graph` before testing real approval email delivery.
