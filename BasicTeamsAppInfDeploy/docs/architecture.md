@@ -49,12 +49,12 @@ The solution is deployed into the target client environment. The Teams app, Azur
 
 The MSP participates as an approver through email. This keeps the first version simple and avoids requiring the MSP tenant to hold broad delegated or application permissions over client tenants.
 
-For the test deployment:
+Example deployment model:
 
 | Role | Tenant |
 | --- | --- |
-| Target/client tenant | `CholbingDevoutlook.onmicrosoft.com` |
-| MSP/approver tenant | `plutonix.onmicrosoft.com` |
+| Target/client tenant | `contoso.onmicrosoft.com` |
+| MSP/approver tenant | `msp.example.com` |
 
 The target tenant owns the runtime and Microsoft Graph provisioning permissions. The MSP tenant only receives approval email in the MVP.
 
@@ -97,8 +97,8 @@ target_tenant_id        = "00000000-0000-0000-0000-000000000000"
 graph_client_id         = "00000000-0000-0000-0000-000000000000"
 graph_client_secret_ref = "https://vault-name.vault.azure.net/secrets/graph-client-secret"
 license_group_id        = "00000000-0000-0000-0000-000000000000"
-approval_email          = "approver@plutonix.onmicrosoft.com"
-approval_sender_upn     = "onboarding@CholbingDevoutlook.onmicrosoft.com"
+approval_email          = "approver@msp.example.com"
+approval_sender_upn     = "onboarding@contoso.onmicrosoft.com"
 ```
 
 Terraform then deploys the Azure runtime and consumes the supplied IDs and secret references without owning the privileged Entra configuration.
@@ -131,7 +131,7 @@ The generated client secret is not output as a raw value. It is stored in Key Va
 The sender mailbox UPN is supplied by the deployment actor:
 
 ```text
-Approval__SenderUserPrincipalName=onboarding@CholbingDevoutlook.onmicrosoft.com
+Approval__SenderUserPrincipalName=onboarding@contoso.onmicrosoft.com
 ```
 
 `Approval__BaseUrl` is set to a placeholder during the first Terraform apply, then updated post-deploy to the generated Function App URL. This avoids a Terraform dependency cycle between Function App creation and app settings.
@@ -156,7 +156,7 @@ The MVP uses Microsoft Graph `sendMail` for approval notifications.
 The target tenant should provide a dedicated sender mailbox, for example:
 
 ```text
-onboarding@CholbingDevoutlook.onmicrosoft.com
+onboarding@contoso.onmicrosoft.com
 ```
 
 The Azure Functions app sends mail through:

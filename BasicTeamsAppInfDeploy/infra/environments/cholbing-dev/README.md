@@ -153,7 +153,7 @@ If admin consent is missing, sign in with a Global Administrator or suitable pri
 
 Graph approval email also requires the configured `approval_sender_user_principal_name` to have an active Exchange Online mailbox. Graph `sendMail` can fail even when app consent is correct if the mailbox is not provisioned yet.
 
-Use logging mode for smoke tests when Graph consent or mailbox readiness is not complete:
+Use logging mode for validation when Graph consent or mailbox readiness is not complete:
 
 ```powershell
 cd ..\..\..

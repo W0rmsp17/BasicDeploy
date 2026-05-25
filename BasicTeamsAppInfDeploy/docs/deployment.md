@@ -103,6 +103,8 @@ Useful options:
 
 Use `Logging` while Graph consent or mailbox provisioning is incomplete. Use `Graph` for real approval email delivery.
 
+For production, use a dedicated sender mailbox on a verified client domain where possible. New trial tenants or `onmicrosoft.com`-only sender addresses can hit external Exchange Online edge filtering even when Graph `sendMail` works correctly. Internal approval delivery is a useful validation path when testing a new tenant.
+
 ## Teams App
 
 After deployment, the generated manifest is written to:
