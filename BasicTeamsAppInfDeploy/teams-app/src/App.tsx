@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AlertCircle, CheckCircle2, ClipboardList, Save, Send, Settings } from "lucide-react";
 import {
   type OnboardingFormState,
@@ -14,6 +14,7 @@ type AppProps = {
 const emptyForm: OnboardingFormState = {
   firstName: "",
   lastName: "",
+  userPrincipalNamePrefix: "",
   jobTitle: "",
   department: "",
   managerEmail: "",
@@ -23,6 +24,18 @@ const emptyForm: OnboardingFormState = {
 };
 
 const profileOptions = ["Standard", "Operations", "Finance", "Field", "Executive"];
+const namingPreferenceKey = "m365-onboarding.namingPreference";
+const rememberNamingPreferenceKey = "m365-onboarding.rememberNamingPreference";
+
+type NamingPreference = "first.last" | "first" | "first.lastinitial" | "firstinitial.last" | "custom";
+
+const namingOptions: Array<{ value: NamingPreference; label: string }> = [
+  { value: "first.last", label: "first.last" },
+  { value: "first", label: "first" },
+  { value: "first.lastinitial", label: "first.last initial" },
+  { value: "firstinitial.last", label: "first initial.last" },
+  { value: "custom", label: "Other" }
+];
 
 export function App({ isRunningInTeams }: AppProps) {
   const [form, setForm] = useState<OnboardingFormState>(emptyForm);
@@ -31,16 +44,26 @@ export function App({ isRunningInTeams }: AppProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [response, setResponse] = useState<SubmitOnboardingResponse | null>(null);
+  const [namingPreference, setNamingPreference] = useState<NamingPreference>(() => loadNamingPreference());
+  const [rememberNamingPreference, setRememberNamingPreference] = useState(() => loadRememberNamingPreference());
 
-  const previewUpn = useMemo(() => {
-    const firstName = form.firstName.trim().toLowerCase();
-    const lastName = form.lastName.trim().toLowerCase();
-    if (!firstName || !lastName) {
-      return "pending";
+  const previewUpn = form.userPrincipalNamePrefix.trim() || "pending";
+
+  useEffect(() => {
+    if (namingPreference === "custom") {
+      return;
     }
 
-    return `${firstName}.${lastName}`.replace(/[^a-z0-9._-]/g, "");
-  }, [form.firstName, form.lastName]);
+    const generatedPrefix = createUpnPrefix(form.firstName, form.lastName, namingPreference);
+    setForm((current) =>
+      current.userPrincipalNamePrefix === generatedPrefix
+        ? current
+        : {
+            ...current,
+            userPrincipalNamePrefix: generatedPrefix
+          }
+    );
+  }, [form.firstName, form.lastName, namingPreference]);
 
   function updateForm<K extends keyof OnboardingFormState>(key: K, value: OnboardingFormState[K]) {
     setForm((current) => ({
@@ -54,6 +77,29 @@ export function App({ isRunningInTeams }: AppProps) {
       ...current,
       [key]: value
     }));
+  }
+
+  function handleNamingPreferenceChange(value: NamingPreference) {
+    setNamingPreference(value);
+
+    if (rememberNamingPreference) {
+      window.localStorage.setItem(namingPreferenceKey, value);
+    }
+
+    if (value !== "custom") {
+      updateForm("userPrincipalNamePrefix", createUpnPrefix(form.firstName, form.lastName, value));
+    }
+  }
+
+  function handleRememberNamingPreferenceChange(value: boolean) {
+    setRememberNamingPreference(value);
+    window.localStorage.setItem(rememberNamingPreferenceKey, String(value));
+
+    if (value) {
+      window.localStorage.setItem(namingPreferenceKey, namingPreference);
+    } else {
+      window.localStorage.removeItem(namingPreferenceKey);
+    }
   }
 
   function handleSaveConfig() {
@@ -158,6 +204,39 @@ export function App({ isRunningInTeams }: AppProps) {
                 required
               />
             </label>
+            <label>
+              UPN naming
+              <select
+                value={namingPreference}
+                onChange={(event) => handleNamingPreferenceChange(event.target.value as NamingPreference)}
+              >
+                {namingOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              UPN prefix
+              <input
+                value={form.userPrincipalNamePrefix}
+                onChange={(event) => {
+                  setNamingPreference("custom");
+                  updateForm("userPrincipalNamePrefix", sanitizeUpnPrefix(event.target.value));
+                }}
+                autoComplete="off"
+                required
+              />
+            </label>
+            <label className="checkbox-label">
+              <input
+                checked={rememberNamingPreference}
+                onChange={(event) => handleRememberNamingPreferenceChange(event.target.checked)}
+                type="checkbox"
+              />
+              Remember naming preference
+            </label>
           </div>
         </section>
 
@@ -246,4 +325,46 @@ export function App({ isRunningInTeams }: AppProps) {
       </form>
     </main>
   );
+}
+
+function loadNamingPreference(): NamingPreference {
+  const value = window.localStorage.getItem(namingPreferenceKey);
+  return isNamingPreference(value) ? value : "first.last";
+}
+
+function loadRememberNamingPreference(): boolean {
+  return window.localStorage.getItem(rememberNamingPreferenceKey) !== "false";
+}
+
+function createUpnPrefix(firstName: string, lastName: string, preference: NamingPreference): string {
+  const first = sanitizeUpnPrefix(firstName);
+  const last = sanitizeUpnPrefix(lastName);
+
+  if (!first && !last) {
+    return "";
+  }
+
+  switch (preference) {
+    case "first":
+      return first;
+    case "first.lastinitial":
+      return [first, last.charAt(0)].filter(Boolean).join(".");
+    case "firstinitial.last":
+      return [first.charAt(0), last].filter(Boolean).join(".");
+    case "custom":
+    case "first.last":
+    default:
+      return [first, last].filter(Boolean).join(".");
+  }
+}
+
+function sanitizeUpnPrefix(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "");
+}
+
+function isNamingPreference(value: string | null): value is NamingPreference {
+  return namingOptions.some((option) => option.value === value);
 }

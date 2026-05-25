@@ -3,6 +3,7 @@ import type { RuntimeConfig } from "./config";
 export type OnboardingFormState = {
   firstName: string;
   lastName: string;
+  userPrincipalNamePrefix: string;
   jobTitle: string;
   department: string;
   managerEmail: string;
@@ -49,6 +50,7 @@ function toPayload(form: OnboardingFormState) {
   return {
     firstName: emptyToUndefined(form.firstName),
     lastName: emptyToUndefined(form.lastName),
+    userPrincipalNamePrefix: emptyToUndefined(form.userPrincipalNamePrefix),
     jobTitle: emptyToUndefined(form.jobTitle),
     department: emptyToUndefined(form.department),
     managerEmail: emptyToUndefined(form.managerEmail),

@@ -90,4 +90,36 @@ public sealed class SubmitOnboardingRequestTests
         Assert.Equal("Test onboarding request", record.Notes);
         Assert.Equal(OnboardingRequestStatus.PendingApproval, record.Status);
     }
+
+    [Fact]
+    public void ToRecord_UsesProvidedUserPrincipalNamePrefix()
+    {
+        var request = new SubmitOnboardingRequest
+        {
+            FirstName = "Alex",
+            LastName = "Wilber",
+            UserPrincipalNamePrefix = " a.wilber ",
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd")
+        };
+
+        var record = request.ToRecord("CholbingDevoutlook.onmicrosoft.com");
+
+        Assert.Equal("a.wilber@CholbingDevoutlook.onmicrosoft.com", record.UserPrincipalName);
+    }
+
+    [Fact]
+    public void Validate_ReturnsError_WhenUserPrincipalNamePrefixContainsInvalidCharacters()
+    {
+        var request = new SubmitOnboardingRequest
+        {
+            FirstName = "Alex",
+            LastName = "Wilber",
+            UserPrincipalNamePrefix = "alex@wilber"
+        };
+
+        var result = request.Validate("CholbingDevoutlook.onmicrosoft.com");
+
+        Assert.False(result.IsValid);
+        Assert.Contains("UPN prefix can contain only letters, numbers, periods, underscores, and hyphens.", result.Errors);
+    }
 }

@@ -8,6 +8,8 @@ public sealed partial record SubmitOnboardingRequest
 
     public string? LastName { get; init; }
 
+    public string? UserPrincipalNamePrefix { get; init; }
+
     public string? JobTitle { get; init; }
 
     public string? Department { get; init; }
@@ -39,6 +41,23 @@ public sealed partial record SubmitOnboardingRequest
             errors.Add("Default user domain is not configured.");
         }
 
+        var normalizedUpnPrefix = NormalizeUpnPrefix();
+        if (!string.IsNullOrWhiteSpace(UserPrincipalNamePrefix))
+        {
+            if (string.IsNullOrWhiteSpace(normalizedUpnPrefix))
+            {
+                errors.Add("UPN prefix must contain letters or numbers.");
+            }
+            else if (normalizedUpnPrefix.Length > 64)
+            {
+                errors.Add("UPN prefix must be 64 characters or fewer.");
+            }
+            else if (!UpnPrefixPattern().IsMatch(normalizedUpnPrefix))
+            {
+                errors.Add("UPN prefix can contain only letters, numbers, periods, underscores, and hyphens.");
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(ManagerEmail) && !EmailPattern().IsMatch(ManagerEmail))
         {
             errors.Add("Manager email must be a valid email address.");
@@ -65,8 +84,12 @@ public sealed partial record SubmitOnboardingRequest
         var firstName = FirstName!.Trim();
         var lastName = LastName!.Trim();
         var displayName = $"{firstName} {lastName}";
-        var upnPrefix = $"{firstName}.{lastName}".ToLowerInvariant();
-        var normalizedUpnPrefix = UpnUnsafeCharacters().Replace(upnPrefix, string.Empty);
+        var normalizedUpnPrefix = NormalizeUpnPrefix();
+        if (string.IsNullOrWhiteSpace(normalizedUpnPrefix))
+        {
+            var upnPrefix = $"{firstName}.{lastName}".ToLowerInvariant();
+            normalizedUpnPrefix = UpnUnsafeCharacters().Replace(upnPrefix, string.Empty);
+        }
 
         var parsedStartDate = ParseStartDate();
 
@@ -92,8 +115,18 @@ public sealed partial record SubmitOnboardingRequest
     [GeneratedRegex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex EmailPattern();
 
+    [GeneratedRegex("^[a-z0-9._-]+$", RegexOptions.Compiled)]
+    private static partial Regex UpnPrefixPattern();
+
     [GeneratedRegex("[^a-z0-9._-]", RegexOptions.Compiled)]
     private static partial Regex UpnUnsafeCharacters();
+
+    private string? NormalizeUpnPrefix()
+    {
+        return string.IsNullOrWhiteSpace(UserPrincipalNamePrefix)
+            ? null
+            : UserPrincipalNamePrefix.Trim().ToLowerInvariant();
+    }
 
     private DateOnly? ParseStartDate()
     {
